@@ -1,4 +1,4 @@
-# PriceHistory.py
+# price_history.py
 from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, Float, Boolean, String, Column, Integer, ForeignKey
