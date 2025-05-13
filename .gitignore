@@ -1,0 +1,32 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite database files
+*.sqlite3
+*.db
+steamtracker.db
+
+# Virtual environment
+venv/
+.env/
+.env
+
+# PyCharm project files
+.idea/
+
+# Logs and caches
+*.log
+*.pid
+*.cache
+*.swp
+
+# macOS system files
+.DS_Store
+
+# VSCode settings (optional, if you or teammates use VSCode)
+.vscode/
+
+# Uvicorn reload artifacts
+.reload*
