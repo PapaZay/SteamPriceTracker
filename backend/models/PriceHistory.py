@@ -2,7 +2,7 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, Float, Boolean, String, Column, Integer, ForeignKey
-from .base import Base
+from backend.models.base import Base
 
 
 class PriceHistory(Base):
