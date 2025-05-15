@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException, Path
+from fastapi import FastAPI, HTTPException, Path, Depends, Header
 import httpx
 from pydantic import BaseModel
+from backend.api.auth import verify_token, get_current_user
 app = FastAPI()
 
 class PriceOverview(BaseModel):
@@ -17,8 +18,12 @@ class FreeOrUnavailable(BaseModel):
 def read_root():
     return {"message": "SteamDB tracker is running..."}
 
+@app.get("/protected")
+async def protected(user = Depends(get_current_user)):
+    return {"message": "This is a protected endpoint.", "user": user}
+
 @app.get("/price/{app_id}", response_model=PriceOverview | FreeOrUnavailable)
-async def get_game_prices(app_id: int):
+async def get_game_prices(app_id: int, payload: dict = Depends(verify_token)):
     url = f"https://store.steampowered.com/api/appdetails?appids={app_id}&cc=us&l=en"
 
     async with httpx.AsyncClient(timeout=10) as client:
