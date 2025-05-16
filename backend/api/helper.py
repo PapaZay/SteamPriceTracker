@@ -1,7 +1,6 @@
 # helper.py
 from fastapi import HTTPException, Path, Depends, Header
 import httpx
-from pydantic import BaseModel
 async def get_game_data(app_id: int):
     url = f"https://store.steampowered.com/api/appdetails?appids={app_id}&cc=us&l=en"
 
