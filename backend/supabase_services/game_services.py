@@ -1,6 +1,6 @@
 # game_services.py
 from backend.supabase_client import supabase
-
+from backend.models.game import Game
 def add_game(game_data: dict):
     result = supabase.table("games").insert(game_data).execute()
     return result.data
