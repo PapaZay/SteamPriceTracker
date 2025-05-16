@@ -1,17 +1,12 @@
 # price_history.py
-from datetime import datetime, timezone
+from pydantic import BaseModel
+from datetime import datetime
+from typing import Optional
 
-from sqlalchemy import DateTime, Float, Boolean, String, Column, Integer, ForeignKey
-from backend.models.base import Base
-
-
-class PriceHistory(Base):
-    __tablename__ = "PriceHistory"
-
-    id = Column(Integer, primary_key=True, index=True)
-    game_id = Column(Integer, ForeignKey("games.id"), nullable=False)
-    timestamp = Column(DateTime, default=datetime.now(timezone.utc), nullable=False)
-    initial_price = Column(Float, nullable=False)
-    final_price = Column(Float, nullable=False)
-    discount_percent = Column(Integer, nullable=True)
-    currency = Column(String, nullable=True)
+class PriceHistory(BaseModel):
+    game_id: int
+    timestamp: datetime
+    initial_price: float
+    final_price: float
+    discount_percent: Optional[int] = None
+    currency: Optional[str] = None
