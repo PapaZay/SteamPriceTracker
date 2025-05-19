@@ -3,6 +3,7 @@ import httpx
 from pydantic import BaseModel
 from backend.api.auth import verify_token, get_current_user
 from backend.api.helper import get_game_data
+from backend.supabase_client import supabase
 from backend.supabase_services.game_services import get_game_by_id, add_game
 from backend.supabase_services.user_games_services import track_game_for_user
 from backend.models.game import Game
@@ -67,7 +68,11 @@ async def track_price(app_id: int, user=Depends(get_current_user)):
 
 
 
-
+@app.get("/tracked")
+async def get_tracked_games(user=Depends(get_current_user)):
+    user_id = user["sub"]
+    tracked_games = supabase.table("user_games").select("*, games(name)").eq("user_id", user_id).execute()
+    return tracked_games.data
 @app.get("/price/{app_id}", response_model=PriceOverview | FreeOrUnavailable)
 async def get_game_prices(app_id: int, payload: dict = Depends(verify_token)):
     app_data = await get_game_data(app_id)
