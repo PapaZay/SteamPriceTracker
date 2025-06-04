@@ -68,7 +68,7 @@ async def track_price(app_id: int, user=Depends(get_current_user)):
 
 
 
-@app.get("/tracked")
+@app.get("/tracked", summary="Get tracked games for user")
 async def get_tracked_games(user=Depends(get_current_user)):
     user_id = user["sub"]
     tracked_games = supabase.table("user_games").select("*, games(name)").eq("user_id", user_id).execute()
