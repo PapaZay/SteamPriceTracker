@@ -12,4 +12,3 @@ def get_games():
 
 def update_game_price(app_id: int, new_price: float, discount_percent: int):
     result = supabase.table("games").update({"last_known_price": new_price, "discount_percent": discount_percent}).eq("app_id", app_id).execute()
-    return result.data

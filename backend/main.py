@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from backend.api.auth import verify_token, get_current_user
 from backend.api.helper import get_game_data
 from backend.supabase_client import supabase
-from backend.supabase_services.game_services import get_game_by_id, add_game
+from backend.supabase_services.game_services import get_game_by_id, add_game, update_game_price
 from backend.supabase_services.price_history_services import get_latest_price, insert_price_history
 from backend.supabase_services.user_games_services import track_game_for_user
 from backend.models.game import Game
@@ -54,17 +54,25 @@ async def track_price(app_id: int, user=Depends(get_current_user)):
         game_name = new_game.name
         price_info = game_data.get("price_overview")
         inserted_game = get_game_by_id(new_game.app_id)
-        game_id = inserted_game.id
+        inserted_game_data = inserted_game.data[0]
+        game_id = inserted_game_data["id"]
     else:
         app_data = await get_game_data(app_id)
         game_data = game_result.data[0]
         game_name = game_data["name"]
+        new_current_price = app_data["data"].get("price_overview").get("final")
+        db_price = game_data.get("last_known_price")
+        new_discount = app_data["data"].get("price_overview").get("discount_percent")
+        db_percent = game_data.get("discount_percent")
+        # can possibly refactor this to run the conditional first
         price_info = {
-            "initial_price": app_data["data"].get("price_overview").get("initial") / 100,
-            "final": game_data.get("last_known_price"),
-            "discount_percent": game_data.get("discount_percent"),
+            "initial": app_data["data"].get("price_overview").get("initial") / 100,
+            "final": new_current_price / 100 if new_current_price != db_price else db_price,
+            "discount_percent": new_discount if new_discount != db_percent else db_percent,
             "currency": game_data.get("currency")
         }
+        if (new_current_price != db_price) or (new_discount != db_percent):
+            update_game_price(app_id, new_price=new_current_price / 100, discount_percent=new_discount)
         #initial_price = game_data.get("initial_price")
         game_id = game_data["id"]
     try:
@@ -78,7 +86,7 @@ async def track_price(app_id: int, user=Depends(get_current_user)):
 
     if price_info and price_info.get("final") is not None:
         current_price = price_info.get("final")
-        current_initial = price_info.get("initial_price")
+        current_initial = price_info.get("initial")
         discount = price_info.get("discount_percent", 0)
         currency = price_info.get("currency")
         latest = get_latest_price(game_id)
