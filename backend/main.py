@@ -66,8 +66,8 @@ async def track_price(app_id: int, user=Depends(get_current_user)):
         db_percent = game_data.get("discount_percent")
         # can possibly refactor this to run the conditional first
         price_info = {
-            "initial": app_data["data"].get("price_overview").get("initial") / 100,
-            "final": new_current_price / 100 if new_current_price != db_price else db_price,
+            "initial": app_data["data"].get("price_overview").get("initial"),
+            "final": new_current_price if new_current_price != db_price else db_price,
             "discount_percent": new_discount if new_discount != db_percent else db_percent,
             "currency": game_data.get("currency")
         }
@@ -85,8 +85,8 @@ async def track_price(app_id: int, user=Depends(get_current_user)):
 
 
     if price_info and price_info.get("final") is not None:
-        current_price = price_info.get("final")
-        current_initial = price_info.get("initial")
+        current_price = price_info.get("final") / 100
+        current_initial = price_info.get("initial") / 100
         discount = price_info.get("discount_percent", 0)
         currency = price_info.get("currency")
         latest = get_latest_price(game_id)
