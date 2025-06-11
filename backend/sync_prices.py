@@ -9,7 +9,7 @@ logger = logging.getLogger("price_sync")
 def start():
     scheduler.add_job(sync_prices, 'interval', hours=6)
     scheduler.start()
-    logger.info("Price scheduler started.")
+    logger.info("Price syncing started.")
 
 def sync_prices():
     asyncio.run(run_sync_prices())
@@ -33,7 +33,7 @@ async def run_sync_prices():
             new_discount = price_info["discount_percent"]
 
             if new_price != db_price or new_discount != db_discount:
-                update_game_price(new_price=new_price, discount_percent=new_discount)
+                update_game_price(app_id, new_price=new_price, discount_percent=new_discount)
                 logger.info(f"Updated {game['name']} to ${new_price} with {new_discount}% off.")
         except Exception as e:
             logger.error(f"Error syncing game {app_id}: {e}")
