@@ -1,5 +1,3 @@
-from os import WCONTINUED
-
 from apscheduler.schedulers.background import BackgroundScheduler
 import asyncio
 import logging
