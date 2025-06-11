@@ -9,11 +9,13 @@ from backend.supabase_services.price_history_services import get_latest_price, i
 from backend.supabase_services.user_games_services import track_game_for_user
 from backend.models.game import Game
 import logging
+from backend.sync_prices import run_sync_prices
+from backend.sync_prices import start
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
 
-logger.info("Main app starting up...")
+logger.info("app starting up...")
 
 app = FastAPI()
 
@@ -29,11 +31,11 @@ class FreeOrUnavailable(BaseModel):
 
 @app.get("/")
 def read_root():
-    return {"message": "SteamDB tracker is running..."}
+    return {"message": "SteamPriceTracker is running..."}
 
 @app.get("/protected")
 async def protected(user = Depends(get_current_user)):
-    return {"message": "This is a protected endpoint.", "user": user}
+    return {"message": "This endpoint is protected.", "user": user}
 @app.get("/track-price/{app_id}")
 async def track_price(app_id: int, user=Depends(get_current_user)):
     user_id = user["sub"]
@@ -130,4 +132,10 @@ async def get_game_prices(app_id: int, payload: dict = Depends(verify_token)):
         )
     else:
         return FreeOrUnavailable(message="This game is either free or unavailable.")
+@app.post("/admin/sync")
+async def trigger_sync():
+    await run_sync_prices()
+    return {"message": "Sync completed"}
+
+start()
 
