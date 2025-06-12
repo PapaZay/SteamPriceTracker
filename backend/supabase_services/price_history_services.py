@@ -1,5 +1,4 @@
 from backend.supabase_client import supabase
-from datetime import datetime, timezone
 import logging
 logger = logging.getLogger(__name__)
 def get_latest_price(game_id: int):
@@ -20,7 +19,6 @@ def insert_price_history(game_id: int, initial_price: float, final_price: float,
 
     entry = {
         "game_id": game_id,
-        #"timestamp": datetime.now(timezone.utc).isoformat(),  # or omit if Supabase default handles it
         "initial_price": initial_price,
         "final_price": final_price,
         "discount_percent": discount_percent,
