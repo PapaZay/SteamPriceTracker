@@ -30,6 +30,7 @@ async def run_sync_prices():
             steam_api_call = await get_game_data(app_id)
             price_info = steam_api_call["data"].get("price_overview")
             if not price_info:
+                logger.info(f"Skipping {game['name']} since it is free.")
                 continue
 
             new_current = price_info["final"] / 100
