@@ -10,7 +10,7 @@ from backend.supabase_services.price_history_services import insert_price_histor
 scheduler = BackgroundScheduler()
 logger = logging.getLogger("price_sync")
 def start():
-    scheduler.add_job(sync_prices, 'interval', minutes=1)
+    scheduler.add_job(sync_prices, 'interval', hours=1)
     scheduler.start()
     logger.info("Price syncing started.")
 
