@@ -1,6 +1,7 @@
 from jose import jwt, jwk, JWTError
 from fastapi import Depends, HTTPException, Header, status, security, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from backend.supabase_client import supabase
 from typing import Optional
 import httpx
 from dotenv import load_dotenv
@@ -48,3 +49,14 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Security(secu
         raise HTTPException(status_code=401, detail="Invalid Token")
 async def get_current_user(token = Depends(verify_token)):
     return token
+
+def sync_user_profile(user: dict):
+    supabase_id = user["sub"]
+    email = user.get("email")
+    if not email:
+        return
+
+    supabase.table("user_profiles").upsert({
+        "supabase_id": supabase_id,
+        "email": email
+    }, on_conflict="supabase_id").execute()

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Path, Depends, Header
 #import httpx
 from pydantic import BaseModel
-from backend.api.auth import verify_token, get_current_user
+from backend.api.auth import verify_token, get_current_user, sync_user_profile
 from backend.api.helper import get_game_data
 from backend.supabase_client import supabase
 from backend.supabase_services.game_services import get_game_by_id, add_game, update_game_price
@@ -35,7 +35,10 @@ def read_root():
 
 @app.get("/protected")
 async def protected(user = Depends(get_current_user)):
-    return {"message": "This endpoint is protected.", "user": user}
+    sync_user_profile(user)
+    return {"message": "You are authenticated.",
+            "user": user["sub"],
+            "email": user.get("email")}
 @app.get("/track-price/{app_id}")
 async def track_price(app_id: int, user=Depends(get_current_user)):
     user_id = user["sub"]

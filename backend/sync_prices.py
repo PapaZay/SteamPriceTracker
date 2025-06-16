@@ -6,6 +6,7 @@ import logging
 from backend.supabase_services.game_services import get_games, update_game_price
 from backend.api.helper import get_game_data
 from backend.supabase_services.price_history_services import insert_price_history, get_latest_price
+from backend.supabase_services.user_games_services import price_drop_notifications
 
 scheduler = BackgroundScheduler()
 logger = logging.getLogger("price_sync")
@@ -52,6 +53,12 @@ async def run_sync_prices():
 
                 )
                 update_game_price(app_id, new_price=new_current, discount_percent=new_discount)
+                price_drop_notifications(
+                    app_id=app_id,
+                    game_name=game['name'],
+                    new_price=new_current,
+                    discount_percent=new_discount
+                )
                 logger.info(f"logged price history change for {game['name']} (${new_current}, {new_discount}% off).")
         except Exception as e:
             logger.error(f"Error syncing game {app_id}: {e}")
