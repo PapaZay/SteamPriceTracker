@@ -11,7 +11,7 @@ from backend.supabase_services.user_games_services import price_drop_notificatio
 scheduler = BackgroundScheduler()
 logger = logging.getLogger("price_sync")
 def start():
-    scheduler.add_job(sync_prices, 'interval', hours=1)
+    scheduler.add_job(sync_prices, 'interval', hours=4)
     scheduler.start()
     logger.info("Price syncing started.")
 
