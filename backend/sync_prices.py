@@ -52,14 +52,18 @@ async def run_sync_prices():
                     currency=currency
 
                 )
-                update_game_price(app_id, new_price=new_current, discount_percent=new_discount)
-                price_drop_notifications(
-                    app_id=app_id,
-                    game_name=game['name'],
-                    new_price=new_current,
-                    discount_percent=new_discount
-                )
                 logger.info(f"logged price history change for {game['name']} (${new_current}, {new_discount}% off).")
+                update_game_price(app_id, new_price=new_current, discount_percent=new_discount)
+                if new_current < latest_current or new_discount > latest_discount:
+                    price_drop_notifications(
+                        app_id=app_id,
+                        game_name=game['name'],
+                        new_price=new_current,
+                        discount_percent=new_discount
+                    )
+                else:
+                    logger.info(f"Updated {game['name']}'s price, but no drop detected.")
+
         except Exception as e:
             logger.error(f"Error syncing game {app_id}: {e}")
     #logger.info("Syncing complete.")
