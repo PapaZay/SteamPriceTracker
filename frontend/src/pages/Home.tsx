@@ -1,4 +1,3 @@
-import {Link} from "react-router-dom";
 import Navbar from "../components/Navbar.tsx";
 
 export default function Home(){
@@ -11,6 +10,8 @@ export default function Home(){
             <button className="px-6 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition">
                 Start Tracking
             </button>
+                <h1 className="text-4xl text-red-600 font-extrabold mb-4 mt-4">Website is currently under maintenance as it is still under development.
+                Please come back later. :)</h1>
             </main>
         </div>
     );
