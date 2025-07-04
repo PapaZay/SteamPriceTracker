@@ -1,28 +1,30 @@
-import { useEffect, useState } from 'react'
+import {Sun, Moon} from "lucide-react";
+import {useTheme} from "../contexts/ThemeContext.tsx";
 import { Link } from 'react-router-dom';
-const Navbar = () => {
-  const [dark, setDark] = useState(false)
+import {useAuth} from "../contexts/AuthContext.tsx";
+import UserProfile from "./UserProfile.tsx";
 
-  useEffect(() => {
-    if (dark) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [dark])
+const Navbar = () => {
+  const {darkMode, setDarkMode} = useTheme();
+  const {user, loading} = useAuth();
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-darkblue shadow-md">
       <div className="text-xl font-bold text-black dark:text-white">
         SteamPriceTracker
       </div>
-      <div className="flex gap-4">
+      <div className="flex gap-4 items-center">
         <Link
           to="/"
           className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
         >
           Home
         </Link>
+        {!loading && (
+            user ? (
+                <UserProfile />
+            ) : (
+                <>
         <Link
           to="/login"
           className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
@@ -35,11 +37,15 @@ const Navbar = () => {
         >
           Register
         </Link>
+            </>
+          )
+          )}
+
         <button
-          onClick={() => setDark(!dark)}
+          onClick={() => setDarkMode(!darkMode)}
           className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-700 text-black dark:text-white"
         >
-          {dark ? '☀️' : '🌙'}
+          {darkMode ? <Sun className="h-5 w-5"/> : <Moon className="h-5 w-5"/>}
         </button>
       </div>
     </nav>
