@@ -14,7 +14,7 @@ interface Game {
 }
 
 export const GameSearch = () => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const API_URL = import.meta.env.VITE_API_URL;
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Game[]>([]);
     const [loading, setLoading] = useState(false);
