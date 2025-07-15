@@ -1,5 +1,8 @@
 import {useState, useEffect} from "react";
 import {useAuth} from '../contexts/AuthContext.tsx'
+import {useNavigate} from "react-router-dom";
+
+
 
 interface Game {
     app_id: number;
@@ -11,10 +14,12 @@ interface Game {
 }
 
 export const GameSearch = () => {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Game[]>([]);
     const [loading, setLoading] = useState(false);
-    const {token} = useAuth();
+    const {token, user} = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (query.length < 2) {
@@ -25,7 +30,7 @@ export const GameSearch = () => {
         {
             setLoading(true);
             try {
-                const response = await fetch(`http://localhost:8000/search_games?query=${encodeURIComponent(query)}&limit=8`);
+                const response = await fetch(`${API_URL}/search_games?query=${encodeURIComponent(query)}&limit=8`);
                 const data = await response.json();
                 setResults(data.results || []);
             } catch (error) {
@@ -41,8 +46,12 @@ export const GameSearch = () => {
 
 
     const trackGame = async (appId: number) => {
+        if (!token || !user){
+            navigate('/login');
+            return;
+        }
         try {
-            const response = await fetch(`http://localhost:8000/track-price/${appId}`, {
+            const response = await fetch(`${API_URL}/track-price/${appId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -50,10 +59,18 @@ export const GameSearch = () => {
             });
 
             if (response.ok) {
-                alert('Game added to tracking!');
+                const result = await response.json();
+                alert(result.message || 'Game added to tracking!');
 
                 setQuery(query + ' ');
                 setQuery(query.trim());
+            } else {
+                const error = await response.json();
+                if (response.status === 400) {
+                    alert('You are already tracking this game!');
+                } else {
+                    alert(error.detail || 'Failed to track game');
+                }
             }
 
         } catch (error) {
@@ -102,7 +119,7 @@ export const GameSearch = () => {
                             <button onClick={() => trackGame(game.app_id)}
                                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                     >
-                                Track Price
+                                {token ? 'Track Price' : 'Login to Track'}
                             </button>
                         </div>
                     ))}

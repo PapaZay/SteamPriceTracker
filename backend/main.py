@@ -22,7 +22,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "https://api.steampricetracker.com", "https://www.api.steampricetracker.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -89,10 +89,12 @@ async def track_price(app_id: int, user=Depends(get_current_user)):
             update_game_price(app_id, new_price=new_current_price / 100, discount_percent=new_discount)
         #initial_price = game_data.get("initial_price")
         game_id = game_data["id"]
+    already_tracking = False
     try:
         track_game_for_user(user_id, app_id)
     except HTTPException as e:
         if e.status_code == 400:
+            already_tracking = True
             logger.info(f"User {user_id} is already tracking App ID {app_id}. Continuing to price tracking.")
         else:
             raise
@@ -116,9 +118,16 @@ async def track_price(app_id: int, user=Depends(get_current_user)):
                 discount_percent=discount,
                 currency=currency
             )
-        return {"message": f"{user_id} is tracking price for game '{game_name}' (App ID: {app_id}).",
-                "price": price_info
-                }
+        if already_tracking:
+            return {"message": f"You are already tracking '{game_name}'. Price updated if changed.",
+                    "price": price_info,
+                    "already_tracking": True
+                    }
+        else:
+            return {"message": f"Now tracking price for '{game_name}'.",
+                    "price": price_info,
+                    "already_tracking": False
+                    }
     else:
         return FreeOrUnavailable(message=f"{game_name} is either free or unavailable, add priced games to your watchlist.")
 
