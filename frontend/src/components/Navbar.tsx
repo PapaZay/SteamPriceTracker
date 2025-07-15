@@ -10,9 +10,11 @@ const Navbar = () => {
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-darkblue shadow-md">
-      <div className="text-xl font-bold text-black dark:text-white">
+        <Link to="/">
+      <button className="text-xl font-bold text-black dark:text-white dark:bg-darkblue bg-white">
         SteamPriceTracker
-      </div>
+      </button>
+        </Link>
       <div className="flex gap-4 items-center">
         <Link
           to="/"

@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Path, Depends, Header
 #import httpx
 from pydantic import BaseModel
 from backend.api.auth import verify_token, get_current_user, sync_user_profile
-from backend.api.helper import get_game_data
+from backend.api.helper import get_game_data, search_games_with_fallback
 from backend.supabase_client import supabase
 from backend.supabase_services.game_services import get_game_by_id, add_game, update_game_price
 from backend.supabase_services.price_history_services import get_latest_price, insert_price_history
@@ -11,6 +11,7 @@ from backend.models.game import Game
 import logging
 from backend.sync_prices import run_sync_prices
 from backend.sync_prices import start
+from fastapi.middleware.cors import CORSMiddleware
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -18,6 +19,14 @@ logger = logging.getLogger(__name__)
 logger.info("app starting up...")
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class PriceOverview(BaseModel):
     game: str
@@ -135,6 +144,10 @@ async def get_game_prices(app_id: int, payload: dict = Depends(verify_token)):
         )
     else:
         return FreeOrUnavailable(message="This game is either free or unavailable.")
+
+@app.get("/search_games")
+async def search_games(query: str, limit: int = 10):
+    return await search_games_with_fallback(query, limit)
 @app.post("/admin/sync")
 async def trigger_sync():
     await run_sync_prices()
