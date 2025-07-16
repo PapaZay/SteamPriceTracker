@@ -22,8 +22,8 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "https://steampricetracker.com", "https://api.steampricetracker.com", "https://www.steampricetracker.com"],
-    allow_credentials=False,
+    allow_origins=["https://api.steampricetracker.com", "https://www.api.steampricetracker.com", "http://localhost:5173"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
