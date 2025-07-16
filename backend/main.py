@@ -51,6 +51,8 @@ async def protected(user = Depends(get_current_user)):
 @app.get("/track-price/{app_id}")
 async def track_price(app_id: int, user=Depends(get_current_user)):
     user_id = user["sub"]
+    # confirms new users are in user_profiles table when they track their first game
+    sync_user_profile(user)
     game_result = get_game_by_id(app_id)
     if not game_result or not game_result.data:
         app_data = await get_game_data(app_id)
