@@ -6,7 +6,7 @@ from backend.api.helper import get_game_data, search_games_with_fallback
 from backend.supabase_client import supabase
 from backend.supabase_services.game_services import get_game_by_id, add_game, update_game_price
 from backend.supabase_services.price_history_services import get_latest_price, insert_price_history
-from backend.supabase_services.user_games_services import track_game_for_user
+from backend.supabase_services.user_games_services import track_game_for_user, untrack_game_for_user
 from backend.models.game import Game
 import logging
 from backend.sync_prices import run_sync_prices
@@ -159,6 +159,12 @@ async def get_game_prices(app_id: int, payload: dict = Depends(verify_token)):
 @app.get("/search_games")
 async def search_games(query: str, limit: int = 10):
     return await search_games_with_fallback(query, limit)
+
+@app.delete("/untrack/{app_id}")
+async def untrack_game(app_id: int, user=Depends(get_current_user)):
+    user_id = user["sub"]
+    untrack_game_for_user(user_id=user_id, app_id=app_id)
+    return {"message": "Game removed from watchlist."}
 @app.post("/admin/sync")
 async def trigger_sync():
     await run_sync_prices()

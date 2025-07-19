@@ -55,3 +55,9 @@ def price_drop_notifications(app_id: int, game_name: str, new_price: float, disc
             else:
                 logger.warning(f"Failed to send email to {email}: {response}")
         logger.info(f"Sent price drop emails for {game_name} to {len(emails)} users")
+
+def untrack_game_for_user(user_id: int, app_id: int):
+    result = supabase.table("user_games").delete().eq("user_id", user_id).eq("app_id", app_id).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Game not found in watchlist.")
+    return result.data
