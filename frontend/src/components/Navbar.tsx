@@ -24,7 +24,17 @@ const Navbar = () => {
         </Link>
         {!loading && (
             user ? (
+                <>
+                    <Link to="/search"
+                          className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white">
+                        Search
+                    </Link>
+                    <Link to="/dashboard"
+                          className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white">
+                        Dashboard
+                    </Link>
                 <UserProfile />
+                </>
             ) : (
                 <>
         <Link
