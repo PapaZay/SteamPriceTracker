@@ -26,30 +26,30 @@ jobs:
             });
             return deployment.data.id;
 
-    - name: Deploy to EC2
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_KEY }}
-        script: |
-          cd /home/ec2-user/SteamPriceTracker
-          git pull origin master
-          sudo systemctl restart steampricetracker
-          cd frontend
-          npm run build
-          sudo cp -r dist/* /var/www/steampricetracker.com/
-          sudo systemctl restart nginx
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /home/ec2-user/SteamPriceTracker
+            git pull origin master
+            sudo systemctl restart steampricetracker
+            cd frontend
+            npm run build
+            sudo cp -r dist/* /var/www/steampricetracker.com/
+            sudo systemctl restart nginx
 
-    - name: Update deployment status
-      if: always()
-      uses: actions/github-script@v7
-      with:
-        script: |
-          await github.rest.repos.createDeploymentStatus({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            deployment_id: ${{ steps.deployment.outputs.result }},
-            state: '${{ job.status }}' === 'success' ? 'success' : 'failure'
-          });
+      - name: Update deployment status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{ steps.deployment.outputs.result }},
+              state: '${{ job.status }}' === 'success' ? 'success' : 'failure'
+            });
               
