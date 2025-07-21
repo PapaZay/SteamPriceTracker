@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Path, Depends, Header
 #import httpx
 from pydantic import BaseModel
 from backend.api.auth import verify_token, get_current_user, sync_user_profile
-from backend.api.helper import get_game_data, search_games_with_fallback
+from backend.api.helper import get_game_data, search_games_fallback
 from backend.supabase_client import supabase
 from backend.supabase_services.game_services import get_game_by_id, add_game, update_game_price
 from backend.supabase_services.price_history_services import get_latest_price, insert_price_history
@@ -158,7 +158,7 @@ async def get_game_prices(app_id: int, payload: dict = Depends(verify_token)):
 
 @app.get("/search_games")
 async def search_games(query: str, limit: int = 10):
-    return await search_games_with_fallback(query, limit)
+    return await search_games_fallback(query, limit)
 
 @app.delete("/untrack/{app_id}")
 async def untrack_game(app_id: int, user=Depends(get_current_user)):

@@ -29,7 +29,46 @@ async def get_game_data(app_id: int):
         raise HTTPException(status_code=404, detail="Game not found.")
     return app_data
 
-async def search_games_with_fallback(query: str, limit: int = 10):
+async def search_steam_api(query: str, limit: int = 10): # for games not in database, used in search
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.get("https://store.steampowered.com/api/storesearch/", params={"term": query, "cc": "us", "l": "en"})
+            if resp.status_code == 200:
+                data = resp.json()
+                items = data.get("items", [])
+
+                results = []
+                for item in items[:limit]:
+                    price_info = None
+                    currency = "USD"
+                    discount_percent = 0
+
+                    if "price" in item and item["price"]:
+                        initial_price = item["price"].get("initial", 0)
+                        final_price = item["price"].get("final", 0)
+
+                        price_info = final_price / 100 if final_price else None
+                        currency = item["price"].get("currency", "USD")
+
+                        if initial_price and final_price and initial_price > final_price:
+                            discount_percent = int(((initial_price - final_price) / initial_price) * 100)
+
+                    results.append({
+                        "app_id": item["id"],
+                        "name": item["name"],
+                        "current_price": price_info,
+                        "currency": currency,
+                        "discount_percent": discount_percent,
+                        "is_free": price_info == 0 if price_info is not None else None,
+                        "image": item.get("tiny_image", "")
+                    })
+                return results
+    except Exception as e:
+                print(f"Steam store Search failed: {e}")
+                return []
+    return []
+
+async def search_games_fallback(query: str, limit: int = 10):
     results = []
 
     print(f"Searching database for: {query}")
@@ -42,10 +81,23 @@ async def search_games_with_fallback(query: str, limit: int = 10):
             "current_price": game.get("last_known_price"),
             "currency": game.get("currency"),
             "discount_percent": game.get("discount_percent"),
-            "is_free": game.get("is_free")
+            "is_free": game.get("is_free"),
+            "in_database": True
         })
 
-    print(f"Found {len(results)} games in database")
-    return {"results": results}
+    print(f"Found {len(results)} games in db.")
 
+    if len(results) < limit:
+        remaining = limit - len(results)
+        print(f"Searching steam store for {remaining} more games...")
+
+        try:
+            steam_results = await search_steam_api(query, remaining)
+
+            for steam_game in steam_results:
+                if not any(game["app_id"] == steam_game["app_id"] for game in results):
+                    results.append({**steam_game, "in_database": False})
+        except Exception as e:
+            print(f"Steam store Search failed: {e}")
+    return {"results": results[:limit]}
 
