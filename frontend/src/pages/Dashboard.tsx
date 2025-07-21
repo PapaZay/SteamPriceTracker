@@ -7,8 +7,11 @@ interface TrackedGamesProps {
     app_id: number;
     games: {
         name: string;
+        last_known_price: number | null;
+        currency: string;
+        discount_percent: number;
+        is_free: boolean;
     };
-    price: number;
 }
 
 export default function Dashboard() {
@@ -120,6 +123,19 @@ export default function Dashboard() {
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{game.games.name}</h3>
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                                     App ID: {game.app_id}
+                                </p>
+                                <p>
+                                    Current Price: {game.games.last_known_price !== null && game.games.last_known_price !== undefined ? (
+                                        <span>
+                                            {game.games.last_known_price} {game.games.currency}
+                                            {game.games.discount_percent > 0 && (
+                                                <span className="ml-2 text-red-600">-{game.games.discount_percent}%</span>
+                                            )}
+                                        </span>
+                                    ) : (
+                                        <span className="text-gray-500">Price not available</span>
+                                    )
+                                    }
                                 </p>
                                 <button
                                     onClick={() => handleDeleteGames(game.app_id)}

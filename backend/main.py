@@ -138,7 +138,7 @@ async def track_price(app_id: int, user=Depends(get_current_user)):
 @app.get("/tracked", summary="Get tracked games for user")
 async def get_tracked_games(user=Depends(get_current_user)):
     user_id = user["sub"]
-    tracked_games = supabase.table("user_games").select("*, games(name)").eq("user_id", user_id).execute()
+    tracked_games = supabase.table("user_games").select("*, games(name, last_known_price, currency, discount_percent, is_free)").eq("user_id", user_id).execute()
     return tracked_games.data
 @app.get("/price/{app_id}", response_model=PriceOverview | FreeOrUnavailable)
 async def get_game_prices(app_id: int, payload: dict = Depends(verify_token)):
