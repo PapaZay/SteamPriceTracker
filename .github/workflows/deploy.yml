@@ -8,6 +8,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      deployments: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -18,11 +21,11 @@ jobs:
         with:
           script: |
             const deployment = await github.rest.repos.createDeployment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            ref: context.sha,
-            environment: 'production',
-            description: 'Deploy to EC2'
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'production',
+              description: 'Deploy to EC2'
             });
             return deployment.data.id;
 
