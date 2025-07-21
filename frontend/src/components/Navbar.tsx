@@ -13,7 +13,7 @@ const Navbar = () => {
         <Link to="/">
       <button className="text-xl font-bold text-black dark:text-white dark:bg-darkblue bg-white">
         SteamPriceTracker
-          <span className="px-2 py-1 text-xs ml-2 text-blue-600 bg-blue-100 rounded align-super">Beta</span>
+         {/* <span className="px-2 py-1 text-xs ml-2 text-blue-600 bg-blue-100 rounded align-super">Beta</span> */}
       </button>
         </Link>
       <div className="flex gap-4 items-center">
