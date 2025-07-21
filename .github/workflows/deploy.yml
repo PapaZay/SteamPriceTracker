@@ -7,7 +7,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production
     permissions:
       deployments: write
       contents: read
@@ -40,10 +39,10 @@ jobs:
           script: |
             cd /home/ec2-user/SteamPriceTracker
             git pull origin master
-            sudo systemctl restart steampricetracker
             cd frontend
             npm run build
             sudo cp -r dist/* /var/www/steampricetracker.com/
+            sudo systemctl restart steampricetracker
             sudo systemctl restart nginx
 
       - name: Update deployment status
