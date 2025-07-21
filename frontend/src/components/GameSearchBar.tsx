@@ -112,7 +112,7 @@ export const GameSearch = () => {
                                 <div className="text-sm text-gray-600">
                                     {game.is_free ? (
                                         <span className="text-green-600">Free</span>
-                                        ) : game.current_price ? (
+                                        ) : game.current_price !== null ? (
                                             <span>
                                                 {game.current_price} {game.currency}
                                                 {game.discount_percent > 0 && (
@@ -136,7 +136,7 @@ export const GameSearch = () => {
             )}
             {query.length >= 2 && !loading && results.length === 0 && (
         <div className="mt-4 text-center text-gray-500">
-            No games found in database. Try tracking a game first!
+            No games found. Try searching for specific games titles!
         </div>
     )}
         </div>
