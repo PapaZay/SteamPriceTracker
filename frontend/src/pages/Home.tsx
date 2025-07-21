@@ -13,8 +13,6 @@ export default function Home(){
                 Start Tracking
             </button>
                 </Link>
-                <h1 className="text-4xl text-red-600 font-extrabold mb-4 mt-4">Website is currently under maintenance as it is still under development.
-                Please come back later. :)</h1>
             </main>
         </div>
     );
