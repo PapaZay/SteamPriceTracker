@@ -26,7 +26,8 @@ jobs:
               environment: 'production',
               description: 'Deploy to EC2',
               auto_merge: false,
-              required_contexts: []
+              required_contexts: [],
+              creator: context.actor
             });
             return deployment.data.id;
 
