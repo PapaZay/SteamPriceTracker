@@ -45,7 +45,7 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --parameters 'commands=[
               "sudo su - ec2-user -c \"cd /home/ec2-user/SteamPriceTracker && git pull origin master\"",
-              "sudo su - ec2-user -c \"cd /home/ec2-user/SteamPriceTracker/frontend && npm run build\"",
+              "sudo su - ec2-user -c \"cd /home/ec2-user/SteamPriceTracker/frontend && npm ci && npm run build\"",
               "sudo cp -r /home/ec2-user/SteamPriceTracker/frontend/dist/* /var/www/steampricetracker.com/",
               "sudo systemctl restart steampricetracker",
               "sudo systemctl restart nginx"
