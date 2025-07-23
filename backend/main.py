@@ -1,11 +1,10 @@
 from fastapi import FastAPI, HTTPException, Path, Depends, Header
-#import httpx
 from pydantic import BaseModel
 from backend.api.auth import verify_token, get_current_user, sync_user_profile
 from backend.api.helper import get_game_data, search_games_fallback
 from backend.supabase_client import supabase
 from backend.supabase_services.game_services import get_game_by_id, add_game, update_game_price
-from backend.supabase_services.price_history_services import get_latest_price, insert_price_history
+from backend.supabase_services.price_history_services import get_latest_price, insert_price_history, get_price_history
 from backend.supabase_services.user_games_services import track_game_for_user, untrack_game_for_user
 from backend.models.game import Game
 import logging
@@ -159,6 +158,25 @@ async def get_game_prices(app_id: int, payload: dict = Depends(verify_token)):
 @app.get("/search_games")
 async def search_games(query: str, limit: int = 10):
     return await search_games_fallback(query, limit)
+
+@app.get("/price-history/{app_id}")
+async def get_game_price_history(app_id: int = Path(..., title="Steam App ID")):
+    try:
+        game_data = get_game_by_id(app_id)
+        if not game_data:
+            raise HTTPException(status_code=404, detail="Game not found")
+
+        game_id = game_data.data[0]["id"]
+        price_history = get_price_history(game_id)
+
+        return {
+            "app_id": app_id,
+            "game_name": game_data.data[0]["name"],
+            "price_history": price_history
+        }
+    except Exception as e:
+        logger.error(f"Error fetching price history for app_id {app_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch price history")
 
 @app.delete("/untrack/{app_id}")
 async def untrack_game(app_id: int, user=Depends(get_current_user)):

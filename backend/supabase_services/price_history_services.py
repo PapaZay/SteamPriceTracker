@@ -31,3 +31,10 @@ def insert_price_history(game_id: int, initial_price: float, final_price: float,
         return result.data[0]
     else:
         raise Exception(f"Failed to insert price history: {result}")
+
+def get_price_history(game_id: int, limit: int = 100):
+    result = supabase.table("price_history").select("*").eq("game_id", game_id).order("timestamp", desc=True).limit(limit).execute()
+    if result.data:
+        return result.data
+    else:
+        raise Exception(f"Failed to get price history.")
