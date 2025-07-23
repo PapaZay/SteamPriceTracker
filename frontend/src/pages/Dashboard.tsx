@@ -2,6 +2,7 @@ import { useState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import {useAuth} from "../contexts/AuthContext.tsx";
 import Navbar from "../components/Navbar.tsx";
+import toast from 'react-hot-toast'
 
 interface TrackedGamesProps {
     app_id: number;
@@ -47,7 +48,7 @@ export default function Dashboard() {
                     setTrackedGames(data);
                 }
             } catch (error) {
-                console.error('Failed to fetch tracked games:', error)
+                toast.error(`Failed to fetch tracked games: ${error}`)
             } finally {
                 setLoading(false);
             }
@@ -57,25 +58,49 @@ export default function Dashboard() {
 
     }, [token]);
 
-    const handleDeleteGames = async (appId: number) => {
-        if (!confirm('Are you sure you want to stop tracking this game?')) {
-            return;
-        }
-        try {
-            const response = await fetch(`${API_URL}/untrack/${appId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (response.ok) {
-                setTrackedGames(games => games.filter(game => game.app_id !== appId));
-                alert('Game removed from watchlist!');
-            }
-        } catch (error) {
-            console.error('Failed to remove game:', error);
-        }
+    const handleDeleteGames = async (appId: number, gameName: string) => {
+        toast((t) => (
+            <div className="flex flex-col gap-3 p-2">
+                <p className="font-medium">Stop tracking "{gameName}"?</p>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => {
+                            toast.dismiss(t.id)
+                            performDelete(appId);
+                        }}
+                        className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+                        Yes, Remove
+                    </button>
+                    <button
+                        onClick={() => toast.dismiss(t.id)}
+                        className="px-3 py-1 bg-gray-300 text-gray-700 rounded text-sm hover:bg-gray-400"
+                        >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        ), {
+            duration: Infinity,
+            position: "top-center"
+        });
     };
+
+    const performDelete = async (appId: number) => {
+      try {
+          const response = await fetch(`${API_URL}/untrack/${appId}`, {
+              method: 'DELETE',
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+          if (response.ok) {
+              setTrackedGames(games => games.filter(game => game.app_id !== appId));
+              toast.success('Game removed from watchlist!');
+          }
+      } catch (error) {
+          toast.error(`Failed to remove game: ${error}`);
+      }
+  };
 
     if (loading) {
         return (
@@ -138,7 +163,7 @@ export default function Dashboard() {
                                     }
                                 </p>
                                 <button
-                                    onClick={() => handleDeleteGames(game.app_id)}
+                                    onClick={() => handleDeleteGames(game.app_id, game.games.name)}
                                     className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
                                     Remove From Watchlist
                                 </button>

@@ -1,7 +1,7 @@
 import {useState, useEffect} from "react";
 import {useAuth} from '../contexts/AuthContext.tsx'
 import {useNavigate} from "react-router-dom";
-
+import toast from "react-hot-toast";
 
 
 interface Game {
@@ -62,21 +62,21 @@ export const GameSearch = () => {
 
             if (response.ok) {
                 const result = await response.json();
-                alert(result.message || 'Game added to tracking!');
+                toast.success(result.message || 'Game added to tracking!');
 
                 setQuery(query + ' ');
                 setQuery(query.trim());
             } else {
                 const error = await response.json();
                 if (response.status === 400) {
-                    alert('You are already tracking this game!');
+                    toast('You are already tracking this game!');
                 } else {
-                    alert(error.detail || 'Failed to track game');
+                    toast.error(error.detail || 'Failed to track game');
                 }
             }
 
         } catch (error) {
-            console.error('Failed to track game:', error);
+            toast.error(`Failed to track game: ${error}`);
         }
     };
 
