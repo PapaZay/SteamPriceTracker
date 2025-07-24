@@ -199,7 +199,6 @@ export default function Dashboard() {
                                 {priceHistory[game.app_id] && (
                                     <div className="mt-4 mb-4">
                                         <PriceChart data={priceHistory[game.app_id]}
-                                                    gameName={game.games.name}
                                                     height={200}
                                                     showTitle={false}
                                         />

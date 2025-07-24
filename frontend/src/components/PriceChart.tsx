@@ -1,76 +1,68 @@
-import Plot from 'react-plotly.js'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-interface PriceData {
+  interface PriceData {
     timestamp: string;
     final_price: number;
     initial_price: number;
     discount_percent: number;
     currency: string;
-}
+  }
 
-interface PriceChartProps {
+  interface PriceChartProps {
     data: PriceData[];
-    gameName: string;
     height?: number;
     showTitle?: boolean;
-}
+  }
 
-export const PriceChart = ({
+  export const PriceChart = ({
     data,
     height = 300,
     showTitle = true
-}: PriceChartProps) => {
-    const sortedData = [...data].sort((a, b) =>
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-    );
+  }: PriceChartProps) => {
+    // Sort and format data for Recharts
+    const chartData = data
+      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+      .map(item => ({
+        date: new Date(item.timestamp).toLocaleDateString(),
+        price: item.final_price,
+        fullDate: item.timestamp
+      }));
 
-    const x = sortedData.map(item => item.timestamp);
-    const y = sortedData.map(item => item.final_price);
-    const currency = sortedData[0]?.currency || 'USD';
+    const currency = data[0]?.currency || 'USD';
 
     return (
-        <Plot
-            data={[{
-                x: x,
-                y: y,
-                type: 'scatter',
-                mode: 'lines+markers',
-                line: {
-                    color: '#1f77b4',
-                    width: 2
-                },
-                marker: {
-                    size: 4,
-                    color: '#1f77b4'
-                },
-                name: 'Price',
-                hovertemplate: `<b>%{y} ${currency}</b><br>%{x}<extra></extra>`
-            }]}
-            layout={{
-                height: height,
-                margin: { t: showTitle ? 40 : 10, r: 10, b: 40, l: 50 },
-                xaxis: {
-                    title: {
-                        text: 'Date',
-                    },
-                type: 'date',
-            },
-
-                yaxis: {
-                    title: {
-                        text: `Price (${currency})`
-                    },
-                    fixedrange: false
-                },
-                showlegend: false,
-                plot_bgcolor: 'rgba(0,0,0,0)',
-                paper_bgcolor: 'rgba(0,0,0,0)'
-            }}
-            config={{
-                displayModeBar: false,
-                responsive: true
-            }}
-            style={{ width: '100%', height: '100%' }}
+      <div style={{ width: '100%', height: height }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="date"
+              fontSize={12}
             />
+            <YAxis
+              fontSize={12}
+              label={{ value: `Price (${currency})`, angle: -90, position: 'insideLeft' }}
+            />
+            <Tooltip
+              formatter={(value) => [`${value} ${currency}`, 'Price']}
+              labelFormatter={(label) => `Date: ${label}`}
+              contentStyle={{
+                background: '#374151',
+                color: 'white',
+                  border: '1px solid #6B7280',
+                borderRadius: '6px',
+              }}
+            />
+            <Line
+              type="monotone"
+              dataKey="price"
+              stroke="#1f77b4"
+              strokeWidth={2}
+              dot={{ r: 3 }}
+              activeDot={{ r: 5 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     );
-};
+  };
