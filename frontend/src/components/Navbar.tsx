@@ -40,13 +40,13 @@ const Navbar = () => {
                 <>
         <Link
           to="/login"
-          className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
+          className="px-4 py-2 rounded hover:bg-gray-100 bg-gray-100 bg-transparent text-black dark:hover:bg-gray-700 dark:text-white"
         >
           Login
         </Link>
         <Link
           to="/register"
-          className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
+          className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-black bg-transparent dark:hover:bg-gray-700 dark:text-white"
         >
           Register
         </Link>
