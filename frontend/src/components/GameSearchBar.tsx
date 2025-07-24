@@ -88,7 +88,7 @@ export const GameSearch = () => {
                     placeholder="Search for games..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white rounded-lg dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                 {loading && (
                     <div className="absolute right-3 top-3">

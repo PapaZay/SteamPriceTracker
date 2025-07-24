@@ -166,6 +166,7 @@ export default function Login(){
                         </p>
                     </div>
                 </div>
+                <p className="text-center text-gray-950">It's dark...</p>
             </div>
         </div>
     );
