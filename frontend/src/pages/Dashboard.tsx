@@ -200,7 +200,6 @@ export default function Dashboard() {
                                     <div className="mt-4 mb-4">
                                         <PriceChart data={priceHistory[game.app_id]}
                                                     height={200}
-                                                    showTitle={false}
                                         />
                                     </div>
                                 )}

@@ -16,8 +16,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
   export const PriceChart = ({
     data,
-    height = 300,
-    showTitle = true
+    height = 300
   }: PriceChartProps) => {
     // Sort and format data for Recharts
     const chartData = data
