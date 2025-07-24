@@ -53,7 +53,7 @@ export const PriceChart = ({
                     title: {
                         text: 'Date',
                     },
-                type: 'date'
+                type: 'date',
             },
 
                 yaxis: {
