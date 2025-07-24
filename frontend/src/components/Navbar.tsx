@@ -11,7 +11,7 @@ const Navbar = () => {
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-darkblue shadow-md">
         <Link to="/">
-      <button className="text-xl font-bold text-black dark:text-white dark:bg-darkblue bg-white">
+      <button className="text-xl font-bold text-black bg-transparent dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700">
         SteamPriceTracker
          <span className="px-2 py-1 text-xs ml-2 text-white bg-blue-500 rounded align-super">Alpha</span>
       </button>
@@ -19,7 +19,7 @@ const Navbar = () => {
       <div className="flex gap-4 items-center">
         <Link
           to="/"
-          className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
+          className="px-4 py-2 rounded hover:bg-gray-200 text-black dark:hover:bg-gray-700 dark:text-white"
         >
           Home
         </Link>
@@ -27,11 +27,11 @@ const Navbar = () => {
             user ? (
                 <>
                     <Link to="/search"
-                          className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white">
+                          className="px-4 py-2 rounded hover:bg-gray-200 text-black dark:hover:bg-gray-700 dark:text-white">
                         Search
                     </Link>
                     <Link to="/dashboard"
-                          className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white">
+                          className="px-4 py-2 rounded hover:bg-gray-200 text-black dark:hover:bg-gray-700 dark:text-white">
                         Dashboard
                     </Link>
                 <UserProfile />
@@ -56,7 +56,7 @@ const Navbar = () => {
 
         <button
           onClick={() => setDarkMode(!darkMode)}
-          className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-700 text-black dark:text-white"
+          className="px-4 py-2 rounded hover:bg-gray-200 bg-transparent text-black dark:hover:bg-gray-700 dark:text-white"
         >
           {darkMode ? <Sun className="h-5 w-5"/> : <Moon className="h-5 w-5"/>}
         </button>
