@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {useAuth} from "../contexts/AuthContext.tsx";
 import Navbar from "../components/Navbar.tsx";
 import toast from 'react-hot-toast'
+import {PriceChart} from "../components/PriceChart.tsx";
 
 interface TrackedGamesProps {
     app_id: number;
@@ -16,6 +17,7 @@ interface TrackedGamesProps {
 }
 
 export default function Dashboard() {
+    const [priceHistory, setPriceHistory] = useState<{[key: number]: any[]}>({});
     const [trackedGames, setTrackedGames] = useState<TrackedGamesProps[]>([]);
     const {token, user} = useAuth();
     const [loading, setLoading] = useState(true);
@@ -83,6 +85,33 @@ export default function Dashboard() {
             duration: Infinity,
             position: "top-center"
         });
+    };
+
+    const fetchPriceHistory = async (appId: number)  => {
+        try {
+            const response = await fetch(`${API_URL}/price-history/${appId}`);
+            if (response.ok){
+                const data = await response.json();
+                setPriceHistory(prev => ({
+                    ...prev,
+                    [appId]: data.price_history
+                }));
+            }
+        } catch (error) {
+            toast.error(`Failed to fetch price history: ${error}`)
+        }
+    };
+
+    const togglePriceHistory = (appId: number) => {
+        if (priceHistory[appId]){
+            setPriceHistory(prev => {
+                const newState = {...prev};
+                delete newState[appId];
+                return newState;
+            });
+        } else {
+            fetchPriceHistory(appId);
+        }
     };
 
     const performDelete = async (appId: number) => {
@@ -162,6 +191,20 @@ export default function Dashboard() {
                                     )
                                     }
                                 </p>
+                                <button onClick={() => togglePriceHistory(game.app_id)}
+                                        className="w-full px-4 py-2 mb-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    {priceHistory[game.app_id] ? 'Hide Chart' : 'Show Price History'}
+                                </button>
+
+                                {priceHistory[game.app_id] && (
+                                    <div className="mt-4 mb-4">
+                                        <PriceChart data={priceHistory[game.app_id]}
+                                                    gameName={game.games.name}
+                                                    height={200}
+                                                    showTitle={false}
+                                        />
+                                    </div>
+                                )}
                                 <button
                                     onClick={() => handleDeleteGames(game.app_id, game.games.name)}
                                     className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
