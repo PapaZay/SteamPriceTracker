@@ -17,7 +17,6 @@ interface PriceChartProps {
 
 export const PriceChart = ({
     data,
-    gameName,
     height = 300,
     showTitle = true
 }: PriceChartProps) => {
@@ -50,13 +49,17 @@ export const PriceChart = ({
             layout={{
                 height: height,
                 margin: { t: showTitle ? 40 : 10, r: 10, b: 40, l: 50 },
-                title: showTitle ? `${gameName} - Price History` : '',
                 xaxis: {
-                    title: 'Date',
-                    type: 'date'
-                },
+                    title: {
+                        text: 'Date',
+                    },
+                type: 'date'
+            },
+
                 yaxis: {
-                    title: `Price (${currency})`,
+                    title: {
+                        text: `Price (${currency})`
+                    },
                     fixedrange: false
                 },
                 showlegend: false,
