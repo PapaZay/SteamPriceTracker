@@ -31,19 +31,6 @@ jobs:
             });
             return deployment.data.id;
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install dependencies and build
-        run: |
-          cd frontend
-          npm ci
-          npm run build
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -53,20 +40,16 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          # Create tarball of built files
-          cd frontend
-          tar -czf ../dist.tar.gz -C dist .
-          cd ..
-          
-          # Upload and deploy
           aws ssm send-command \
             --instance-ids ${{ secrets.AWS_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
             --parameters 'commands=[
               "sudo su - ec2-user -c \"cd /home/ec2-user/SteamPriceTracker && git pull origin master\"",
+              "sudo su - ec2-user -c \"cd /home/ec2-user/SteamPriceTracker/frontend && npm ci && npm run build\"",
               "sudo rm -rf /var/www/steampricetracker.com/*",
-              "sudo su - ec2-user -c \"cd /home/ec2-user/SteamPriceTracker && tar -xzf dist.tar.gz -C /tmp\"",
-              "sudo cp -r /tmp/* /var/www/steampricetracker.com/",
+              "sudo cp -r /home/ec2-user/SteamPriceTracker/frontend/dist/* /var/www/steampricetracker.com/",
+              "sudo chown -R nginx:nginx /var/www/steampricetracker.com/",
+              "sudo chmod -R 755 /var/www/steampricetracker.com/",
               "sudo systemctl restart steampricetracker",
               "sudo systemctl restart nginx"
             ]'
