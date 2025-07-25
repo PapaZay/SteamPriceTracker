@@ -35,7 +35,7 @@ const UserProfile = () => {
 
     return (
         <div className="relative" ref={dropdownRef}>
-            <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            <button className="flex items-center gap-2 p-2 rounded-lg bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     onClick={() => setIsOpen(!isOpen)}
             >
                 {AvatarUrl() ? (
@@ -76,7 +76,7 @@ const UserProfile = () => {
                         </div>
                 </div>
                     <div className="p-2">
-                        <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        <button className="w-full flex items-center gap-3 px-3 py-2 text-left bg-transparent text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                 onClick={handleSignOut}
                         >
                             <LogOut className="w-4 h-4"/>

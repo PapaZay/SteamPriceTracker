@@ -3,7 +3,7 @@ import {Link} from "react-router-dom"
 
 export default function Home(){
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-darkblue text-gray-900 dark:text-gray-100">
+        <div className="min-h-screen overflow-x-hidden bg-gray-100 dark:bg-darkblue text-gray-900 dark:text-gray-100">
             <Navbar />
             <main className="p-8 text-center">
                 <h1 className="text-4xl font-extrabold mb-4">Welcome to SteamPriceTracker</h1>
