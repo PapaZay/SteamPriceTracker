@@ -1,9 +1,9 @@
 import Navbar from "../components/Navbar.tsx";
 import { GameSearch } from "../components/GameSearchBar.tsx";
-
+import Footer from "../components/Footer.tsx";
 export default function Search(){
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-darkblue text-gray-900 dark:text-gray-100">
+        <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-darkblue text-gray-900 dark:text-gray-100">
             <Navbar />
             <main className="p-8">
                 <div className="max-w-4xl mx-auto">
@@ -22,6 +22,7 @@ export default function Search(){
                     <GameSearch />
                 </div>
             </main>
+            <Footer />
         </div>
     );
 }

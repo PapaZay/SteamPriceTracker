@@ -4,7 +4,7 @@ import {useAuth} from "../contexts/AuthContext.tsx";
 import Navbar from "../components/Navbar.tsx";
 import toast from 'react-hot-toast'
 import {PriceChart} from "../components/PriceChart.tsx";
-
+import Footer from "../components/Footer.tsx";
 interface TrackedGamesProps {
     app_id: number;
     games: {
@@ -144,7 +144,7 @@ export default function Dashboard() {
 
     }
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-darkblue text-gray-900 dark:text-gray-100">
+        <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-darkblue text-gray-900 dark:text-gray-100">
             <Navbar/>
             <main className="p-8 mx-auto container">
                 <h1 className="text-xl font-extrabold mb-4 text-gray-900 dark:text-gray-100 text-center">
@@ -213,6 +213,7 @@ export default function Dashboard() {
                     </div>
                 )}
             </main>
+            <Footer/>
         </div>
     );
 }

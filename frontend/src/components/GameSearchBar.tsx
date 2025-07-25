@@ -99,17 +99,17 @@ export const GameSearch = () => {
             {results.length > 0 && (
                 <div className="mt-4 space-y-3">
                     {results.map((game) => (
-                        <div key={game.app_id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                        <div key={game.app_id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-transparent shadow-sm">
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
-                                <h3 className="font-semibold text-gray-900">{game.name}</h3>
+                                <h3 className="font-semibold dark:text-gray-200 text-gray-900">{game.name}</h3>
                                     {game.in_database ? (
                                         <span className="px-2 py-1 text-xs text-green-600 bg-green-100 rounded">In database</span>
                                     ) : (
                                         <span className="px-2 py-1 text-xs text-blue-500 bg-blue-100 rounded">From Steam</span>
                                     )}
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                <div className="text-sm text-gray-500 dark:text-gray-300">
                                     {game.is_free ? (
                                         <span className="text-green-600">Free</span>
                                         ) : game.current_price !== null ? (
