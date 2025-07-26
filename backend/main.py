@@ -6,6 +6,7 @@ from backend.supabase_client import supabase
 from backend.supabase_services.game_services import get_game_by_id, add_game, update_game_price
 from backend.supabase_services.price_history_services import get_latest_price, insert_price_history, get_price_history
 from backend.supabase_services.user_games_services import track_game_for_user, untrack_game_for_user
+from backend.supabase_services.user_profiles_services import is_admin
 from backend.models.game import Game
 import logging
 from backend.sync_prices import run_sync_prices
@@ -187,6 +188,63 @@ async def untrack_game(app_id: int, user=Depends(get_current_user)):
 async def trigger_sync():
     await run_sync_prices()
     return {"message": "Sync completed"}
+
+@app.post("/admin/add-game/{app_id}")
+async def add_game_to_db(app_id: int, user=Depends(get_current_user)):
+    try:
+        user_id = user["sub"]
+
+        if not is_admin(user_id):
+            raise HTTPException(status_code=403, detail="Admin access required.")
+
+        game_result = get_game_by_id(app_id)
+        if game_result and game_result.data:
+            return {
+                    "message": "Game already exists in database.",
+                    "app_id": app_id,
+                    "name": game_result.data[0]["name"],
+                    "status": "exists"
+            }
+
+        app_data = await get_game_data(app_id)
+        game_data = app_data["data"]
+
+        new_game = Game(
+            app_id=app_id,
+            name=game_data["name"],
+            currency=game_data.get("price_overview", {}).get("currency"),
+            is_free=not game_data.get("price_overview"),
+            last_known_price=game_data.get("price_overview", {}).get("final") / 100 if game_data.get("price_overview") else None,
+            discount_percent=game_data.get("price_overview", {}).get("discount_percent", 0)
+        )
+
+
+        add_game(new_game.model_dump())
+
+        if new_game.last_known_price is not None:
+            inserted_game = get_game_by_id(new_game.app_id)
+            if inserted_game and inserted_game.data:
+                game_id = inserted_game.data[0]["id"]
+                update_game_price(app_id, new_price=new_game.last_known_price, discount_percent=new_game.discount_percent)
+                insert_price_history(
+                    game_id=game_id,
+                    initial_price=new_game.last_known_price,
+                    final_price=new_game.last_known_price,
+                    discount_percent=new_game.discount_percent,
+                    currency=new_game.currency
+                )
+        logger.info(f"Admin {user_id} added game {app_id} {{new_game.name}} to database.")
+
+        return {
+                "message": "Game successfully added to database.",
+                "app_id": app_id,
+                "name": new_game.name,
+                "price": new_game.last_known_price,
+                "currency": new_game.currency
+        }
+    except Exception as e:
+        logger.error(f"Error adding game {app_id} to database: {e}")
+        raise HTTPException(status_code=500, detail="Failed to add game to database")
 
 start()
 
