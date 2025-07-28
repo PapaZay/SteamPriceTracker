@@ -35,17 +35,17 @@ const UserProfile = () => {
 
     return (
         <div className="relative" ref={dropdownRef}>
-            <button className="flex items-center gap-2 p-2 rounded-lg bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            <button className="flex items-center gap-2 p-2 rounded-lg bg-transparent hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"
                     onClick={() => setIsOpen(!isOpen)}
             >
                 {AvatarUrl() ? (
                     <img src={AvatarUrl()}
                          alt="Avatar"
-                         className="w-8 h-8 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                         className="w-8 h-8 rounded-full object-cover border-2 border-gray-200 dark:border-gray-400"
                     />
                 ) : (
                     <div className="w-8 h-8 rounded-full bg-gray-300 dark:border-gray-600 flex items-center justify-center">
-                        <User className="w-5 h-5 text-gray-700 dark:text-gray-300"/>
+                        <User className="w-5 h-5 text-gray-700 dark:text-gray-900"/>
                     </div>
                 )}
                 <ChevronDown className={`w-4 h-4 text-gray-600 dark:text-gray-300 transition-transform ${isOpen ? 'rotate-180' : ''}`}/>
@@ -58,7 +58,7 @@ const UserProfile = () => {
                             {AvatarUrl() ? (
                                 <img src={AvatarUrl()}
                                 alt="Avatar"
-                                className="w-10 h-10 rounded-full object-cover"
+                                className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-500"
                                 />
                                 ) : (
                                     <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">

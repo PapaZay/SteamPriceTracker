@@ -185,8 +185,14 @@ async def untrack_game(app_id: int, user=Depends(get_current_user)):
     untrack_game_for_user(user_id=user_id, app_id=app_id)
     return {"message": "Game removed from watchlist."}
 @app.post("/admin/sync")
-async def trigger_sync():
+async def trigger_sync(user=Depends(get_current_user)):
+    user_id = user["sub"]
+
+    if not is_admin(user["sub"]):
+        raise HTTPException(status_code=403, detail="Admin access required.")
+
     await run_sync_prices()
+    logger.info(f"Admin {user_id} triggered sync.")
     return {"message": "Sync completed"}
 
 @app.post("/admin/add-game/{app_id}")
