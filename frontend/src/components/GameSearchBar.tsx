@@ -113,16 +113,29 @@ export const GameSearch = () => {
                                     {game.is_free ? (
                                         <span className="text-green-600">Free</span>
                                         ) : game.current_price !== null ? (
-                                            <span>
-                                                {game.current_price} {game.currency}
-                                                {game.discount_percent > 0 && (
-                                                    <span className="ml-2 text-red-600">-{game.discount_percent}%</span>
+                                            <div className="flex items-center gap-2">
+                                            {game.discount_percent > 0 ? (
+                                                <>
+                                                <span className="text-gray-500 dark:text-gray-400 line-through">
+                                                    {(game.current_price / (1 - game.discount_percent / 100)).toFixed(2)} {game.currency}
+                                                </span>
+                                                    <span className="text-blue-500 font-semibold">
+                                                        {game.current_price} {game.currency}
+                                                    </span>
+                                                    <span className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                                                        -{game.discount_percent}%
+                                                    </span>
+                                                </>
+                                                ) : (
+                                                    <span>
+                                                        {game.current_price} {game.currency}
+                                                    </span>
                                                 )}
-                                            </span>
+                                            </div>
                                         ) : (
                                             <span className="text-gray-500">Price not available</span>
                                         )}
-                                </div>
+                            </div>
                             </div>
 
                             <button onClick={() => trackGame(game.app_id)}
