@@ -1,4 +1,4 @@
-# SteamPriceTracker:
+# SteamPriceTracker
 
 ## Website that allows users to track Steam prices
 
