@@ -122,7 +122,7 @@ export const GameSearch = () => {
                                                     <span className="text-blue-500 font-semibold">
                                                         {game.current_price} {game.currency}
                                                     </span>
-                                                    <span className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                                                    <span className="bg-red-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
                                                         -{game.discount_percent}%
                                                     </span>
                                                 </>

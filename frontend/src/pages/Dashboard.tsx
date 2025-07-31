@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar.tsx";
 import toast from 'react-hot-toast'
 import {PriceChart} from "../components/PriceChart.tsx";
 import Footer from "../components/Footer.tsx";
+import AlertForm from "../components/AlertForm.tsx";
 interface TrackedGamesProps {
     app_id: number;
     games: {
@@ -131,6 +132,27 @@ export default function Dashboard() {
       }
   };
 
+    const handleCreateAlert = async (alertData: any) => {
+        try {
+            const response = await fetch(`${API_URL}/alerts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(alertData)
+            });
+            if (response.ok) {
+                toast.success('Alert created successfully!');
+            } else {
+                const error = await response.json();
+                toast.error(error.detail || 'Failed to create alert');
+            }
+        } catch (error) {
+            toast.error(`Failed to create alert: ${error}`);
+        }
+    }
+
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-100 dark:bg-darkblue">
@@ -181,9 +203,18 @@ export default function Dashboard() {
                                 <p>
                                     Current Price: {game.games.last_known_price !== null && game.games.last_known_price !== undefined ? (
                                         <span>
-                                            {game.games.last_known_price} {game.games.currency}
-                                            {game.games.discount_percent > 0 && (
-                                                <span className="ml-2 text-red-600">-{game.games.discount_percent}%</span>
+                                            {game.games.discount_percent > 0 ? (
+                                                <div className="inline-flex items-center gap-2">
+                                                    <span className="text-gray-500 dark:text-gray-400 line-through">
+                                                        {(game.games.last_known_price / (1 - game.games.discount_percent / 100)).toFixed(2)} {game.games.currency}
+                                                    </span>
+                                                    <span className="text-blue-500 font-semibold">
+                                                        {game.games.last_known_price} {game.games.currency}
+                                                    </span>
+                                                    <span className="font-semibold text-red-600">-{game.games.discount_percent}%</span>
+                                                </div>
+                                            ) : (
+                                                <span>{game.games.last_known_price} {game.games.currency}</span>
                                             )}
                                         </span>
                                     ) : (
@@ -203,6 +234,10 @@ export default function Dashboard() {
                                         />
                                     </div>
                                 )}
+                                <AlertForm
+                                    game={{app_id: game.app_id, name: game.games.name}}
+                                    onCreateAlert={handleCreateAlert}
+                                />
                                 <button
                                     onClick={() => handleDeleteGames(game.app_id, game.games.name)}
                                     className="w-full px-4 py-2 border-red-600 border-2 text-red-600 bg-transparent rounded-lg hover:bg-red-600 hover:text-white transition-colors">

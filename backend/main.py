@@ -7,6 +7,7 @@ from backend.supabase_services.game_services import get_game_by_id, add_game, up
 from backend.supabase_services.price_history_services import get_latest_price, insert_price_history, get_price_history
 from backend.supabase_services.user_games_services import track_game_for_user, untrack_game_for_user
 from backend.supabase_services.user_profiles_services import is_admin
+from backend.supabase_services.price_alert_services import create_price_alert, get_user_alerts
 from backend.models.game import Game
 import logging
 from backend.sync_prices import run_sync_prices
@@ -37,6 +38,11 @@ class PriceOverview(BaseModel):
 
 class FreeOrUnavailable(BaseModel):
     message: str
+
+class AlertRequest(BaseModel):
+    app_id: int
+    alert_type: str
+    target_value: float
 
 @app.get("/")
 def read_root():
@@ -140,6 +146,7 @@ async def get_tracked_games(user=Depends(get_current_user)):
     user_id = user["sub"]
     tracked_games = supabase.table("user_games").select("*, games(name, last_known_price, currency, discount_percent, is_free)").eq("user_id", user_id).execute()
     return tracked_games.data
+
 @app.get("/price/{app_id}", response_model=PriceOverview | FreeOrUnavailable)
 async def get_game_prices(app_id: int, payload: dict = Depends(verify_token)):
     app_data = await get_game_data(app_id)
@@ -178,6 +185,31 @@ async def get_game_price_history(app_id: int = Path(..., title="Steam App ID")):
     except Exception as e:
         logger.error(f"Error fetching price history for app_id {app_id}: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch price history")
+
+@app.get("/alerts")
+async def get_alerts(user=Depends(get_current_user)):
+    user_id = user["sub"]
+    alerts = get_user_alerts(user_id)
+    return {
+        "alerts": alerts,
+        "count": len(alerts)
+    }
+
+@app.post("/alerts")
+async def create_alerts(alert_data: AlertRequest, user=Depends(get_current_user)):
+    user_id = user["sub"]
+
+    result = create_price_alert(
+        user_id=user_id,
+        app_id=alert_data.app_id,
+        alert_type=alert_data.alert_type,
+        target_value=alert_data.target_value
+    )
+
+    if "error" in result:
+        raise HTTPException(status_code=400, detail=result["error"])
+
+    return {"message": "Alert created successfully.", "alert": result}
 
 @app.delete("/untrack/{app_id}")
 async def untrack_game(app_id: int, user=Depends(get_current_user)):
