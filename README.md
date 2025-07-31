@@ -12,6 +12,7 @@
 - Email price alert system where users can set when to send email alerts on different alert type: (% off discount, any $ decrease in price)
 
 ## Planned: (TBD)
+- Individual pages for each game with detailed data
 - Cleaner, professional content in emails instead of simple text
 - More content on homepage (lot of white space)
 - Professional logo for Navbar
