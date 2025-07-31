@@ -17,5 +17,9 @@
 - Professional logo for Navbar
 - Sort and filter tracked games
 - Sort and filter in search bar
-Tech Stack: FastAPI, React, Supabase
-Other Tools: Github Actions, AWS EC2, Nginx, Cloudflare
+
+  
+## Tech Stack:
+- Frontend: React (TypeScript)
+- Backend: FastAPI, Supabase
+- Other Tools: Github Actions, AWS EC2, Nginx, Cloudflare
