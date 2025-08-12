@@ -284,5 +284,12 @@ async def add_game_to_db(app_id: int, user=Depends(get_current_user)):
         logger.error(f"Error adding game {app_id} to database: {e}")
         raise HTTPException(status_code=500, detail="Failed to add game to database")
 
+@app.post("/test-alerts")
+async def test_alerts(user=Depends(get_current_user)):
+    user_id = user["sub"]
+    from backend.supabase_services.price_alert_services import check_price_alerts
+    check_price_alerts()
+    return {"message": "Alerts tested successfully."}
+
 start()
 
