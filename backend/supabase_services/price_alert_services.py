@@ -98,12 +98,11 @@ def check_price_alerts():
             should_trigger = False
 
             if alert["alert_type"] == "percentage_discount":
-                should_trigger = discount_percent >= alert["target_value"]
-                logger.info(f"Percentage check: {discount_percent} >= {alert['target_value']} = {should_trigger}")
+                should_trigger = discount_percent > 0 and discount_percent >= alert["target_value"]
+                logger.info(f"Percentage check: {discount_percent} >= {alert['target_value']} and discount > 0 = {should_trigger}")
             elif alert["alert_type"] == "price_drop":
-                if alert["last_checked_price"] and current_price < alert['last_checked_price']:
+                if alert["last_checked_price"] and current_price < alert['last_checked_price'] and discount_percent > 0:
                     should_trigger = True
-
 
             if should_trigger:
                 user_id = alert["user_id"]
@@ -119,22 +118,8 @@ def check_price_alerts():
             else:
                 supabase.table("price_alerts").update({"last_checked_price": current_price}).eq("id", alert["id"]).execute()
 
+
         for user_id, triggered_alerts in user_triggered_alerts.items():
-            now = datetime.datetime.now(datetime.UTC)
-
-            alerts_to_send = []
-            for alert_data in triggered_alerts:
-                alert = alert_data["alert"]
-                last_triggered = alert.get("triggered_at")
-                if last_triggered:
-                    last_triggered_dt = datetime.datetime.fromisoformat(last_triggered.replace("Z", "+00:00"))
-                    if now - last_triggered_dt < datetime.timedelta(hours=24):
-                        logger.info(f"Skipping alert for user {user_id} because it was triggered recently")
-                        continue
-                alerts_to_send.append(alert_data)
-            if not alerts_to_send:
-                continue
-
             get_emails = supabase.table("user_profiles").select("email").eq("supabase_id", user_id).execute()
             emails = [user["email"] for user in get_emails.data if user.get("email")]
             logger.info(f"Found emails for user {user_id}: {emails}")
@@ -142,10 +127,10 @@ def check_price_alerts():
                 continue
 
             for email in emails:
-                if len(alerts_to_send) == 1:
-                    subject = f"Price alert: {alerts_to_send[0]["game"]["name"]} is on sale!"
+                if len(triggered_alerts) == 1:
+                    subject = f"Price alert: {triggered_alerts[0]["game"]["name"]} is on sale!"
                 else:
-                    subject = f"Price alert: {len(alerts_to_send)} games are on sale!"
+                    subject = f"Price alert: {len(triggered_alerts)} games are on sale!"
 
                 html_content = f"""
                  <!DOCTYPE html>
@@ -171,7 +156,7 @@ def check_price_alerts():
                  """
 
 
-                for alert_data in alerts_to_send:
+                for alert_data in triggered_alerts:
                     game = alert_data["game"]
                     alert = alert_data["alert"]
                     current_price = alert_data["current_price"]
@@ -219,12 +204,12 @@ def check_price_alerts():
 
                 text = "\n".join(
                     [f"{alert_data['game']['name']}: {alert_data['discount_percent']}% OFF on Steam!" for alert_data in
-                     alerts_to_send])
+                     triggered_alerts])
 
                 status, response = send_email(to_email=email, subject=subject, text=text, html=html_content)
                 logger.info(f"Email status: {status}, response: {response}")
                 if status == 200:
-                    for alert_data in alerts_to_send:
+                    for alert_data in triggered_alerts:
                         trigger_alert(alert_data["alert"]["id"], alert_data["current_price"])
     except Exception as e:
         print(f"Error checking price alerts: {e}")
