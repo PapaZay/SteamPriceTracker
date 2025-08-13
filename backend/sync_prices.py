@@ -1,5 +1,5 @@
 from locale import currency
-
+from supabase_client import supabase
 from apscheduler.schedulers.background import BackgroundScheduler
 import asyncio
 import logging
@@ -54,6 +54,9 @@ async def run_sync_prices():
                 )
                 logger.info(f"logged price history change for {game['name']} (${new_current}, {new_discount}% off).")
                 update_game_price(app_id, new_price=new_current, discount_percent=new_discount)
+                if new_discount == 0 and latest_discount > 0:
+                    supabase.table("price_alerts").update({"triggered_at": None}).eq("game_id", game_id).execute()
+                    logger.info(f"Reset price alert for {game['name']} - sale ended.")
                 logger.info(f"Updated {game['name']}'s price, but no drop detected.")
         except Exception as e:
             logger.error(f"Error syncing game {app_id}: {e}")

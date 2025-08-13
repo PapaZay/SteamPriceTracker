@@ -98,10 +98,10 @@ def check_price_alerts():
             should_trigger = False
 
             if alert["alert_type"] == "percentage_discount":
-                should_trigger = discount_percent > 0 and discount_percent >= alert["target_value"]
+                should_trigger = (discount_percent > 0 and discount_percent >= alert["target_value"] and alert["triggered_at"] is None)
                 logger.info(f"Percentage check: {discount_percent} >= {alert['target_value']} and discount > 0 = {should_trigger}")
             elif alert["alert_type"] == "price_drop":
-                if alert["last_checked_price"] and current_price < alert['last_checked_price'] and discount_percent > 0:
+                if alert["last_checked_price"] and current_price < alert['last_checked_price'] and discount_percent > 0 and alert["triggered_at"] is None:
                     should_trigger = True
 
             if should_trigger:
