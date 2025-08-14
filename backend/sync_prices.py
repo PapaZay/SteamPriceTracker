@@ -1,5 +1,5 @@
 from locale import currency
-from supabase_client import supabase
+from backend.supabase_client import supabase
 from apscheduler.schedulers.background import BackgroundScheduler
 import asyncio
 import logging
