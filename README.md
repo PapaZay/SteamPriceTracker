@@ -13,7 +13,7 @@
 
 ## Planned: (TBD)
 - Individual pages for each game with detailed data
-- Cleaner, professional content in emails instead of simple text
+- Cleaner, professional content in emails instead of simple text (Completed)
 - More content on homepage (lot of white space)
 - Professional logo for Navbar
 - Sort and filter tracked games
