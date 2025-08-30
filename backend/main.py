@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Path, Depends, Header, Response
+from fastapi import FastAPI, HTTPException, Path, Depends, Header
 from pydantic import BaseModel
 from backend.api.auth import verify_token, get_current_user, sync_user_profile
 from backend.api.helper import get_game_data, search_games_fallback
@@ -23,38 +23,11 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://steampricetracker.com", "https://www.steampricetracker.com", "https://api.steampricetracker.com", "https://www.api.steampricetracker.com", "http://localhost:5173"],
+    allow_origins=["https://api.steampricetracker.com", "https://www.api.steampricetracker.com", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.middleware("http")
-async def cors_handler(request, call_next):
-    print(f"CORS middleware hit: {request.method} {request.url} from {request.headers.get('origin')}")
-    origin = request.headers.get("origin")
-    allowed_origins = ["https://steampricetracker.com", "https://www.steampricetracker.com", "https://api.steampricetracker.com"]
-    
-    if request.method == "OPTIONS":
-        if origin in allowed_origins:
-            return Response(
-                status_code=200,
-                headers={
-                    "Access-Control-Allow-Origin": origin,
-                    "Access-Control-Allow-Credentials": "true",
-                    "Access-Control-Allow-Methods": "*",
-                    "Access-Control-Allow-Headers": "*",
-                }
-            )
-    
-    response = await call_next(request)
-    if origin in allowed_origins:
-        response.headers["Access-Control-Allow-Origin"] = origin
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Allow-Methods"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "*"
-    
-    return response
 
 class PriceOverview(BaseModel):
     game: str
