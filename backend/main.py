@@ -10,6 +10,7 @@ from backend.supabase_services.user_profiles_services import is_admin
 from backend.supabase_services.price_alert_services import create_price_alert, get_user_alerts
 from backend.models.game import Game
 import logging
+import os
 from backend.sync_prices import run_sync_prices
 from backend.sync_prices import start
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,9 +22,12 @@ logger.info("app starting up...")
 
 app = FastAPI()
 
+cors_origins = ["https://api.steampricetracker.com", "https://www.api.steampricetracker.com"]
+if os.getenv("ENVIORNMENT") != "production":
+    cors_origins.append("http://localhost:5173")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://api.steampricetracker.com", "https://www.api.steampricetracker.com", "http://localhost:5173"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
