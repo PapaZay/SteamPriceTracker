@@ -14,7 +14,18 @@ import os
 from backend.sync_prices import run_sync_prices
 from backend.sync_prices import start
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+import sentry_sdk
 
+load_dotenv()
+
+sentry_sdk.init(
+    dsn=os.getenv("SENTRY_DSN"),
+    send_default_pii=True,
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+    profile_lifecycle="trace"
+)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -294,6 +305,7 @@ async def test_alerts(user=Depends(get_current_user)):
     from backend.supabase_services.price_alert_services import check_price_alerts
     check_price_alerts()
     return {"message": "Alerts tested successfully."}
+
 
 start()
 
