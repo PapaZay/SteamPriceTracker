@@ -14,7 +14,8 @@ const Navbar = () => {
     <nav className="flex items-center justify-between px-2 sm:px-6 py-4 bg-white dark:bg-darkblue shadow-md">
         <div className="flex items-center justify-between w-full px-4 py-4">
         <Link to="/">
-      <button className="text-sm sm:text-xl font-bold text-black bg-transparent dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700">
+      <button className="flex items-center gap-2 sm:text-xl font-bold text-black bg-transparent dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700">
+          <img src="/icons8-tags-windows-11-color-96.png" alt="SteamPriceTracker Logo" className="w-4 h-4 sm:w-5 sm:h-5" />
         SteamPriceTracker
          <span className="px-1 py-0.5 sm:px-2 sm:py-1 text-xs ml-1 sm:ml-2 text-white bg-blue-500 rounded align-super">Alpha</span>
       </button>
@@ -38,6 +39,10 @@ const Navbar = () => {
                           className="px-4 py-2 rounded hover:bg-gray-200 text-black dark:hover:bg-gray-700 dark:text-white">
                         Dashboard
                     </Link>
+                    {/*<Link to="/alerts"
+                          className="px-4 py-2 rounded hover:bg-gray-200 text-black dark:hover:bg-gray-700 dark:text-white">
+                        Alerts
+                    </Link>*/}
                 <UserProfile />
                 </>
             ) : (
@@ -91,6 +96,10 @@ const Navbar = () => {
                                 <Link to="/dashboard"
                                 className="block px-4 py-2 rounded hover:bg-gray-200 text-black dark:hover:bg-gray-700 dark:text-white">
                                     Dashboard
+                                </Link>
+                                <Link to="/alerts"
+                                      className="block px-4 py-2 rounded hover:bg-gray-200 text-black dark:hover:bg-gray-700 dark:text-white">
+                                    Alerts
                                 </Link>
                                 <UserProfile />
                             </>
