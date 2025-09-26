@@ -103,6 +103,27 @@ export default function Alerts() {
         }
     };
 
+    const refetchAlerts = async () => {
+        if (!token || !user) return;
+
+        try {
+            const response = await fetch(`${API_URL}/alerts`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setAlerts(data.alerts);
+            } else {
+                toast.error('Failed to refetch alerts');
+            }
+        } catch (error) {
+            toast.error(`Error refetching alerts: ${error}`);
+        }
+    };
+
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -118,7 +139,7 @@ export default function Alerts() {
                             Manage your price alerts here.
                     </h2>
                     <p className="text-smtext-gray-600 dark:text-gray-400 mt-6">
-                        Note: Price alerts are sent to the email assocated with your account.
+                        Note: Price alerts are sent to the email associated with your account.
                     </p>
                     </div>
                 <button onClick={() => setShowCreateForm(true)}
@@ -191,7 +212,10 @@ export default function Alerts() {
             {showCreateForm && (
                 <CreateAlertModal
                 onClose={() => setShowCreateForm(false)}
-                onSuccess={() => {setShowCreateForm(false)}}
+                onSuccess={() => {
+                    setShowCreateForm(false)
+                    void refetchAlerts();
+                }}
                 />
             )}
             <Footer />
@@ -207,6 +231,8 @@ function CreateAlertModal({onClose, onSuccess}: CreateAlertModalProps): React.Re
     const [loading, setLoading] = useState(false);
     const [trackedGames, setTrackedGames] = useState<TrackedGame[]>([]);
     const [fetchingGames, setFetchingGames] = useState(true);
+    const [gameSearch, setGameSearch] = useState('');
+    const [showGameDropdown, setShowGameDropdown] = useState(false);
     const {token} = useAuth();
     const API_URL = import.meta.env.VITE_API_URL;
 
@@ -268,7 +294,15 @@ function CreateAlertModal({onClose, onSuccess}: CreateAlertModalProps): React.Re
         }
     };
 
+    const filteredGames = trackedGames.filter((game) =>
+        game.games.name.toLowerCase().includes(gameSearch.toLowerCase())
+    );
 
+    useEffect(() => {
+        const handleClickOutside = () => setShowGameDropdown(false);
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
@@ -298,19 +332,61 @@ function CreateAlertModal({onClose, onSuccess}: CreateAlertModalProps): React.Re
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Select Game
+                                Search and Select Game
                             </label>
-                            <select
-                                value={selectedGame}
-                                onChange={(e) => setSelectedGame(e.target.value)}
-                                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                                required
-                            >
-                                <option value="">Choose a game...</option>
-                                {trackedGames.map((game) => (
-                                    <option key={game.app_id} value={game.app_id}>{game.games.name}</option>
-                                ))}
-                            </select>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={gameSearch}
+                                    onChange={(e) => {
+                                        setGameSearch(e.target.value);
+                                        setShowGameDropdown(true);
+                                        setSelectedGame('')
+                                }}
+                                    onFocus={() => setShowGameDropdown(true)}
+                                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                                    placeholder="Start typing to search for your tracked games..."
+                                    required={!selectedGame}
+                                />
+                                {showGameDropdown && gameSearch && (
+                                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 rounded shadow-lg max-h-48 border border-gray-300 dark:border-gray-600 overflow-y-auto">
+                                        {filteredGames.length > 0 ? (
+                                            filteredGames.map((game) => (
+                                                <div
+                                                key={game.app_id}
+                                                onClick={() => {
+                                                    setSelectedGame(game.app_id.toString())
+                                                    setGameSearch(game.games.name);
+                                                    setShowGameDropdown(false);
+                                                }}
+                                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer text-gray-800 dark:text-white"
+                                                >
+                                                    {game.games.name}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="p-2 text-gray-500 dark:text-gray-400">
+                                                No games found matching "{gameSearch}"
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {selectedGame && !showGameDropdown && (
+                                    <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-sm text-blue-700 dark:text-blue-300">
+                                        Selected: {trackedGames.find((g) => g.app_id.toString() === selectedGame)?.games.name}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedGame('')
+                                                setGameSearch('');
+                                            }}
+                                            className="ml-2 text-red-500 hover:text-red-700">
+                                            ✕
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <div>
