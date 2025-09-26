@@ -39,10 +39,10 @@ const Navbar = () => {
                           className="px-4 py-2 rounded hover:bg-gray-200 text-black dark:hover:bg-gray-700 dark:text-white">
                         Dashboard
                     </Link>
-                    {/*<Link to="/alerts"
+                    <Link to="/alerts"
                           className="px-4 py-2 rounded hover:bg-gray-200 text-black dark:hover:bg-gray-700 dark:text-white">
                         Alerts
-                    </Link>*/}
+                    </Link>
                 <UserProfile />
                 </>
             ) : (

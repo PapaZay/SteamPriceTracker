@@ -7,7 +7,7 @@ from backend.supabase_services.game_services import get_game_by_id, add_game, up
 from backend.supabase_services.price_history_services import get_latest_price, insert_price_history, get_price_history
 from backend.supabase_services.user_games_services import track_game_for_user, untrack_game_for_user
 from backend.supabase_services.user_profiles_services import is_admin
-from backend.supabase_services.price_alert_services import create_price_alert, get_user_alerts
+from backend.supabase_services.price_alert_services import create_price_alert, get_user_alerts, delete_alert
 from backend.models.game import Game
 import logging
 import os
@@ -225,6 +225,12 @@ async def create_alerts(alert_data: AlertRequest, user=Depends(get_current_user)
         raise HTTPException(status_code=400, detail=result["error"])
 
     return {"message": "Alert created successfully.", "alert": result}
+
+@app.delete("/alerts/{alert_id}")
+async def delete_alert_endpoint(alert_id: int, user=Depends(get_current_user)):
+    user_id = user["sub"]
+    delete_alert(alert_id, user_id)
+    return {"message": "Alert deleted successfully."}
 
 @app.delete("/untrack/{app_id}")
 async def untrack_game(app_id: int, user=Depends(get_current_user)):
