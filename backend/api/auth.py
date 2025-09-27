@@ -1,5 +1,5 @@
 from jose import jwt, jwk, JWTError
-from fastapi import Depends, HTTPException, Header, status, security, Security
+from fastapi import Cookie, Response, Depends, HTTPException, Header, status, security, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from backend.supabase_client import supabase
 from backend.api.email_service import send_email, send_welcome_email
@@ -39,6 +39,31 @@ async def get_public_keys():
             jwks_cache = {key["kid"]: key for key in keys}
     return jwks_cache
 
+async def verify_token_flexible(auth_token: str = Cookie(None), authorization: str = Header(None)):
+    token = None
+
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ")[1]
+    elif auth_token:
+        token = auth_token
+
+    if not token:
+        raise HTTPException(status_code=401, detail="Authentication Required")
+
+    try:
+        payload = jwt.decode(
+            token,
+            SUPABASE_SECRET,
+            algorithms=["HS256"],
+            audience=SUPABASE_AUDIENCE
+        )
+        return payload
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid Token")
+
+async def get_current_user_flexible(token = Depends(verify_token_flexible)):
+    return token
+
 async def verify_token(credentials: HTTPAuthorizationCredentials = Security(security)):
     token = credentials.credentials
     try:
@@ -52,8 +77,38 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Security(secu
         return payload
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid Token")
+
 async def get_current_user(token = Depends(verify_token)):
     return token
+
+async def exchange_token_for_cookie(token: str, response: Response):
+    try:
+        payload = jwt.decode(
+            token,
+            SUPABASE_SECRET,
+            algorithms=["HS256"],
+            audience=SUPABASE_AUDIENCE
+        )
+        user_id = payload["sub"]
+        response.set_cookie(
+            key="auth_token",
+            value=token,
+            httponly=True,
+            secure=False,
+            samesite="lax",
+            max_age=3600
+        )
+
+        logger.info(f"Token exchanged for cookie for user {payload.get('sub')}")
+        return {"message": "Token exchanged for cookie successfully.", "user_id": payload.get("sub")}
+
+    except JWTError as e:
+        logger.error(f"Error exchanging token for cookie: {e}")
+        raise HTTPException(status_code=401, detail="Invalid Token")
+    except Exception as e:
+        logger.error(f"Unexpected error exchanging token for cookie: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
 
 def sync_user_profile(user: dict):
     supabase_id = user["sub"]

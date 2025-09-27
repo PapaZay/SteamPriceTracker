@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException, Path, Depends, Header
+from fastapi import Response, FastAPI, HTTPException, Path, Depends, Header
 from pydantic import BaseModel
-from backend.api.auth import verify_token, get_current_user, sync_user_profile
+from backend.api.auth import verify_token, get_current_user, sync_user_profile, exchange_token_for_cookie, \
+    get_current_user_flexible
 from backend.api.helper import get_game_data, search_games_fallback
 from backend.supabase_client import supabase
 from backend.supabase_services.game_services import get_game_by_id, add_game, update_game_price
@@ -66,6 +67,9 @@ class AlertRequest(BaseModel):
 class DonationRequest(BaseModel):
     amount: int
     currency: str = "usd"
+
+class TokenRequest(BaseModel):
+    token: str
 
 @app.get("/")
 def read_root():
@@ -245,6 +249,11 @@ async def untrack_game(app_id: int, user=Depends(get_current_user)):
     user_id = user["sub"]
     untrack_game_for_user(user_id=user_id, app_id=app_id)
     return {"message": "Game removed from watchlist."}
+
+@app.post("/exchange-token")
+async def exchange_token(request: TokenRequest, response: Response):
+    return await exchange_token_for_cookie(request.token, response)
+
 @app.post("/admin/sync")
 async def trigger_sync(user=Depends(get_current_user)):
     user_id = user["sub"]
@@ -342,7 +351,7 @@ async def test_welcome_email(user=Depends(get_current_user)):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/create-donation-intent")
-async def create_donation_intent(donation_data: DonationRequest, user=Depends(get_current_user)):
+async def create_donation_intent(donation_data: DonationRequest, user=Depends(get_current_user_flexible)):
     try:
         intent = stripe.PaymentIntent.create(
             amount=donation_data.amount,
