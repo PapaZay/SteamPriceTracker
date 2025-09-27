@@ -2,12 +2,17 @@ from jose import jwt, jwk, JWTError
 from fastapi import Depends, HTTPException, Header, status, security, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from backend.supabase_client import supabase
+from backend.api.email_service import send_email, send_welcome_email
 from typing import Optional
+import logging
 import httpx
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+logger = logging.getLogger(__name__)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_ISSUER= os.getenv("SUPABASE_ISSUER")
@@ -55,8 +60,21 @@ def sync_user_profile(user: dict):
     email = user.get("email")
     if not email:
         return
+    existing_user = supabase.table("user_profiles").select("*").eq("supabase_id", supabase_id).execute()
+    is_new_user = len(existing_user.data) == 0
 
     supabase.table("user_profiles").upsert({
         "supabase_id": supabase_id,
         "email": email
     }, on_conflict="supabase_id").execute()
+
+    if is_new_user:
+        try:
+            username = email.split("@")[0].title() if email else "User"
+            status_code, response = send_welcome_email(email, username)
+            if status_code == 200:
+                logger.info(f"Welcome email sent to {email}")
+            else:
+                logger.error(f"Failed to send welcome email to {email}: {response}")
+        except Exception as e:
+            logger.error(f"Error sending welcome email to {email}: {e}")

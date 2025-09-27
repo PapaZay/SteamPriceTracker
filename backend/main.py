@@ -312,6 +312,26 @@ async def test_alerts(user=Depends(get_current_user)):
     check_price_alerts()
     return {"message": "Alerts tested successfully."}
 
+@app.post("/test-welcome-email")
+async def test_welcome_email(user=Depends(get_current_user)):
+    try:
+        email = user.get("email")
+        if not email:
+            raise HTTPException(status_code=400, detail="Email not found in user profile.")
+
+        from backend.api.email_service import send_welcome_email
+        username = email.split("@")[0].title() if email else "User"
+        status_code, response = send_welcome_email(email, username)
+
+        if status_code == 200:
+            logger.info(f"Test welcome email sent to {email}")
+            return {"message": f"Welcome email sent successfully to {email}", "username": username}
+        else:
+            logger.error(f"Failed to send test welcome email to {email}: {response}")
+            raise HTTPException(status_code=500, detail=f"Failed to send welcome email: {response}")
+    except Exception as e:
+        logger.error(f"Error sending test welcome email: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 start()
 
