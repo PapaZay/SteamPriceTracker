@@ -95,8 +95,7 @@ async def exchange_token_for_cookie(token: str, response: Response):
             value=token,
             httponly=True,
             secure=False,
-            samesite="lax",
-            max_age=3600
+            samesite="lax"
         )
 
         logger.info(f"Token exchanged for cookie for user {payload.get('sub')}")

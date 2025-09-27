@@ -46,7 +46,19 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         }, []);
 
         const signOut = async () => {
-            await supabase.auth.signOut();
+            try{
+                await supabase.auth.signOut();
+
+                await fetch('/api/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                console.log('Logged out successfully.');
+            } catch (error) {
+                console.log('Error logging out:', error);
+            }
+
         };
         return (
             <AuthContext.Provider value={{user, token, loading, signOut}}>

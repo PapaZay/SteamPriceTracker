@@ -81,6 +81,11 @@ async def protected(user = Depends(get_current_user)):
     return {"message": "You are authenticated.",
             "user": user["sub"],
             "email": user.get("email")}
+@app.post("/logout")
+async def logout(response: Response):
+    response.delete_cookie("auth_token")
+    logger.info("User logged out, cookie cleared.")
+    return {"message": "User logged out successfully."}
 @app.get("/track-price/{app_id}")
 async def track_price(app_id: int, user=Depends(get_current_user)):
     user_id = user["sub"]
