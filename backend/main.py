@@ -11,11 +11,13 @@ from backend.supabase_services.price_alert_services import create_price_alert, g
 from backend.models.game import Game
 import logging
 import os
+from datetime import datetime
 from backend.sync_prices import run_sync_prices
 from backend.sync_prices import start
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import sentry_sdk
+import stripe
 
 load_dotenv()
 
@@ -32,6 +34,8 @@ logger = logging.getLogger(__name__)
 logger.info("app starting up...")
 
 app = FastAPI()
+
+stripe.api_key = os.getenv("STRIPE_API_KEY")
 
 cors_origins = ["https://api.steampricetracker.com", "https://www.api.steampricetracker.com"]
 if os.getenv("ENVIORNMENT") != "production":
@@ -58,6 +62,10 @@ class AlertRequest(BaseModel):
     app_id: int
     alert_type: str
     target_value: float
+
+class DonationRequest(BaseModel):
+    amount: int
+    currency: str = "usd"
 
 @app.get("/")
 def read_root():
@@ -332,6 +340,33 @@ async def test_welcome_email(user=Depends(get_current_user)):
     except Exception as e:
         logger.error(f"Error sending test welcome email: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/create-donation-intent")
+async def create_donation_intent(donation_data: DonationRequest, user=Depends(get_current_user)):
+    try:
+        intent = stripe.PaymentIntent.create(
+            amount=donation_data.amount,
+            currency=donation_data.currency,
+            receipt_email=user.get("email"),
+            metadata={
+                'user_id': user["sub"],
+                'email': user.get("email"),
+                'type': 'donation'
+
+            }
+        )
+
+        logger.info(f"Donation intent created for user {user['sub']}: ${donation_data.amount/100}")
+
+        return {
+            "client_secret": intent.client_secret,
+            "amount": donation_data.amount,
+            "currency": donation_data.currency,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error creating donation intent: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create donation intent")
 
 start()
 
