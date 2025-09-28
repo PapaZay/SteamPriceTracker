@@ -13,6 +13,7 @@ import React from 'react';
 import {ThemeProvider} from "./contexts/ThemeContext.tsx";
 import {AuthProvider} from "./contexts/AuthContext.tsx";
 import { Toaster } from 'react-hot-toast'
+import DonationSuccess from "./pages/DonationSuccess.tsx";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -38,6 +39,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                   <Route path="/dashboard" element={<DashBoard />} />
                   <Route path="/alerts" element={<Alerts />} />
                   <Route path="/admin" element={<Admin />} />
+                  <Route path="/donation-success" element={<DonationSuccess />} />
               </Routes>
           </BrowserRouter>
       </ThemeProvider>

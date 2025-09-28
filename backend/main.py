@@ -36,7 +36,7 @@ logger.info("app starting up...")
 
 app = FastAPI()
 
-stripe.api_key = os.getenv("STRIPE_TEST_KEY")
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 cors_origins = ["https://steampricetracker.com", "https://www.steampricetracker.com", "https://api.steampricetracker.com"]
 if os.getenv("ENVIORNMENT") != "production":
@@ -356,32 +356,45 @@ async def test_welcome_email(user=Depends(get_current_user)):
         logger.error(f"Error sending test welcome email: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.post("/create-donation-intent")
-async def create_donation_intent(donation_data: DonationRequest, user=Depends(get_current_user_flexible)):
+@app.post("/create-donation-checkout")
+async def create_donation_checkout(donation_data: DonationRequest, user=Depends(get_current_user_flexible)):
+    base_url = "http://localhost:5173" if os.getenv("ENVIORNMENT") != "production" else "https://steampricetracker.com"
     try:
-        intent = stripe.PaymentIntent.create(
-            amount=donation_data.amount,
-            currency=donation_data.currency,
-            receipt_email=user.get("email"),
-            metadata={
-                'user_id': user["sub"],
-                'email': user.get("email"),
-                'type': 'donation'
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[{
+            'price_data': {
+                'currency': donation_data.currency,
+                'product_data': {
+                    'name': 'SteamPriceTracker Donation',
+                    'description': 'Support SteamPriceTracker development',
+                },
+                'unit_amount': donation_data.amount,
+            },
+            'quantity': 1,
+        }],
+        mode='payment',
+        success_url=f'{base_url}/donation-success',
+        cancel_url=f'{base_url}/',
+        customer_email=user.get("email"),
+        metadata={
+            'user_id': user["sub"],
+            'email': user.get("email"),
+            'type': 'donation'
 
             }
         )
 
-        logger.info(f"Donation intent created for user {user['sub']}: ${donation_data.amount/100}")
+        logger.info(f"Donation checkout created for user {user['sub']}: ${donation_data.amount/100}")
 
         return {
-            "client_secret": intent.client_secret,
-            "amount": donation_data.amount,
-            "currency": donation_data.currency,
+            "checkout_url": session.url,
+            "session_id": session.id,
             "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
-        logger.error(f"Error creating donation intent: {e}")
-        raise HTTPException(status_code=500, detail="Failed to create donation intent")
+        logger.error(f"Error creating donation checkout: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create donation checkout")
 
 start()
 
