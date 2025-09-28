@@ -5,7 +5,7 @@ import {useAuth} from '../contexts/AuthContext';
 import {X} from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_TEST_KEY!);
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY!);
 const API_URL = import.meta.env.VITE_API_URL;
 interface DonationFormProps {
     onClose: () => void;
