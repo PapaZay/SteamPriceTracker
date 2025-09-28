@@ -36,7 +36,7 @@ logger.info("app starting up...")
 
 app = FastAPI()
 
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+stripe.api_key = os.getenv("STRIPE_SECRET_TEST_KEY")
 
 cors_origins = ["https://api.steampricetracker.com", "https://www.api.steampricetracker.com"]
 if os.getenv("ENVIORNMENT") != "production":

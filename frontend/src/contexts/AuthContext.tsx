@@ -3,6 +3,7 @@ import type {ReactNode} from 'react';
 import {supabase} from "../supabaseClient.ts";
 import type {User} from "@supabase/supabase-js";
 
+
 interface AuthContextType {
     user: User | null;
     token: string | null;
@@ -11,6 +12,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
@@ -18,6 +20,22 @@ export const useAuth = () => {
         throw new Error('useAuth must be used within a AuthProvider');
     }
     return context;
+};
+
+const exchangeTokenForCookie = async (token: string) => {
+    try {
+        await fetch(`${API_URL}/exchange-token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({token})
+            });
+            console.log('Token exchanged for HttpOnly cookie')
+        } catch (error) {
+            console.error('Error exchanging token for cookie:', error);
+    }
 };
 
 export const AuthProvider = ({children}: {children: ReactNode}) => {
@@ -30,26 +48,35 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             const {data: {session}} = await supabase.auth.getSession();
             setUser(session?.user ?? null);
             setToken(session?.access_token ?? null);
+
+            if (session?.access_token) {
+                await exchangeTokenForCookie(session.access_token);
+            }
             setLoading(false);
         };
         getSession();
+
 
         const {data: {subscription}} = supabase.auth.onAuthStateChange(
             async (_, session) => {
                 setUser(session?.user ?? null);
                 setToken(session?.access_token ?? null);
+
+                if (session?.access_token) {
+                    await exchangeTokenForCookie(session.access_token);
+                }
                 setLoading(false);
-            }
-        );
+            });
+
 
         return () => subscription.unsubscribe();
         }, []);
 
         const signOut = async () => {
-            try{
+            try {
                 await supabase.auth.signOut();
 
-                await fetch('/api/logout', {
+                await fetch(`${API_URL}/logout`, {
                     method: 'POST',
                     credentials: 'include'
                 });
@@ -65,4 +92,5 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
                 {children}
             </AuthContext.Provider>
         );
+
 };
