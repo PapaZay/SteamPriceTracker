@@ -51,10 +51,15 @@ export default function DonationModal({ isOpen, onClose }: DonationModalProps) {
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">Support SteamPriceTracker</h2>
                     <button onClick={onClose}
-                            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                        ✕
+                            className="text-gray-700 bg-white  dark:bg-gray-800 dark:text-gray-700 dark:hover:text-white">
+                            x
                     </button>
                 </div>
+                <div className="mb-4">
+                    <p className="text-gray-500">Donations are optional, but appreciated.</p>
+                </div>
+
+
 
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -66,7 +71,7 @@ export default function DonationModal({ isOpen, onClose }: DonationModalProps) {
                         onChange={(e) => setAmount(Number(e.target.value))}
                         min="1"
                         step="1"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700
+                        className="w-full px-3 py-2 border border-gray-300 bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
   dark:border-gray-600 dark:text-white"
                         placeholder="Enter amount"
                     />
