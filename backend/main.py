@@ -38,9 +38,10 @@ app = FastAPI()
 
 stripe.api_key = os.getenv("STRIPE_SECRET_TEST_KEY")
 
-cors_origins = ["https://api.steampricetracker.com", "https://www.api.steampricetracker.com"]
+cors_origins = ["https://steampricetracker.com", "https://www.steampricetracker.com"]
 if os.getenv("ENVIORNMENT") != "production":
-    cors_origins.append("http://localhost:5173")
+    cors_origins.extend(["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"])
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
