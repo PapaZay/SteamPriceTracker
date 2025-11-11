@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar.tsx";
 import {Link} from "react-router-dom"
 import Footer from "../components/Footer.tsx";
+import PopularGamesCarousel from "../components/PopularGamesCarousel.tsx";
 export default function Home(){
     return (
         <div className="min-h-screen flex flex-col overflow-x-hidden bg-gray-100 dark:bg-darkblue text-gray-900 dark:text-gray-100">
@@ -14,6 +15,7 @@ export default function Home(){
             </button>
                 </Link>
             </main>
+            <PopularGamesCarousel />
             <Footer />
         </div>
     );

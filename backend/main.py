@@ -396,7 +396,7 @@ async def create_donation_checkout(donation_data: DonationRequest, user=Depends(
         logger.error(f"Error creating donation checkout: {e}")
         raise HTTPException(status_code=500, detail="Failed to create donation checkout")
 @app.get("/popular-games")
-async def get_popular_games(limit: int = 5):
+async def get_popular_games(limit: int = 10):
     try:
        games = await get_popular_games_from_steam(limit)
        return {"games": games}

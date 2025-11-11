@@ -101,23 +101,30 @@ async def search_games_fallback(query: str, limit: int = 10):
             print(f"Steam store Search failed: {e}")
     return {"results": results[:limit]}
 
-async def get_popular_games_from_steam(limit: int = 5):
+async def get_popular_games_from_steam(limit: int = 10):
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             response = await client.get("https://store.steampowered.com/api/featuredcategories/")
             data = response.json()
 
+            print(f"DEBUG: Steam API status code: {response.status_code}")
 
             top_sellers = data.get('top_sellers', {}).get('items', [])
+            print(f"DEBUG: Found {len(top_sellers)} top sellers from Steam")
 
             games = []
             for item in top_sellers:
+                if not item.get('large_capsule_image'):
+                    print(f"DEBUG: Processing game: {item.get('name')} (ID: {item['id']})")
+                    continue
 
                 if item['id'] == 1675200:
+                    print(f"DEBUG: Skipping Steam Deck")
                     continue
 
 
                 if 'steam deck' in item.get('name', '').lower():
+                    print(f"DEBUG: Skipping game with 'steam deck' in name")
                     continue
 
                 games.append({
@@ -134,7 +141,7 @@ async def get_popular_games_from_steam(limit: int = 5):
                   # Stop once we have enough games
                 if len(games) >= limit:
                     break
-
+            print(f"DEBUG: Returning {len(games)} games")
             return games
 
     except Exception as e:
