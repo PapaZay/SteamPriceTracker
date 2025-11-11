@@ -2,7 +2,7 @@ from fastapi import Response, FastAPI, HTTPException, Path, Depends, Header
 from pydantic import BaseModel
 from backend.api.auth import verify_token, get_current_user, sync_user_profile, exchange_token_for_cookie, \
     get_current_user_flexible
-from backend.api.helper import get_game_data, search_games_fallback
+from backend.api.helper import get_game_data, search_games_fallback, get_popular_games_from_steam
 from backend.supabase_client import supabase
 from backend.supabase_services.game_services import get_game_by_id, add_game, update_game_price
 from backend.supabase_services.price_history_services import get_latest_price, insert_price_history, get_price_history
@@ -395,6 +395,13 @@ async def create_donation_checkout(donation_data: DonationRequest, user=Depends(
     except Exception as e:
         logger.error(f"Error creating donation checkout: {e}")
         raise HTTPException(status_code=500, detail="Failed to create donation checkout")
-
+@app.get("/popular-games")
+async def get_popular_games(limit: int = 5):
+    try:
+       games = await get_popular_games_from_steam(limit)
+       return {"games": games}
+    except Exception as e:
+        logger.error(f"Error fetching popular games: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch popular games")
 start()
 

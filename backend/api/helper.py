@@ -101,3 +101,42 @@ async def search_games_fallback(query: str, limit: int = 10):
             print(f"Steam store Search failed: {e}")
     return {"results": results[:limit]}
 
+async def get_popular_games_from_steam(limit: int = 5):
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            response = await client.get("https://store.steampowered.com/api/featuredcategories/")
+            data = response.json()
+
+
+            top_sellers = data.get('top_sellers', {}).get('items', [])
+
+            games = []
+            for item in top_sellers:
+
+                if item['id'] == 1675200:
+                    continue
+
+
+                if 'steam deck' in item.get('name', '').lower():
+                    continue
+
+                games.append({
+                    'app_id': item['id'],
+                    'name': item['name'],
+                    'current_price': item.get('final_price', 0) / 100,
+                    'original_price': item.get('original_price', 0) / 100,
+                    'discount_percent': item.get('discount_percent', 0),
+                    'currency': 'USD',
+                    'header_image': item.get('large_capsule_image', ''),
+                    'is_free': item.get('final_price', 0) == 0
+                })
+
+                  # Stop once we have enough games
+                if len(games) >= limit:
+                    break
+
+            return games
+
+    except Exception as e:
+        print(f"Error fetching Steam top sellers: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch popular games from Steam")
