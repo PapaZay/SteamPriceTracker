@@ -17,7 +17,7 @@ export default function Search(){
                         <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">- indicates the game is not in our database and has no price history data</span>
                     </div>
                     <div className="mb-4 text-center">
-                        <p className="text-gray-600">Note: If a game is not in the database and you track the price, it will be added to the database and price history will be accumulated.</p>
+                        <p className="text-gray-600">Note: If a game is not in the database and you track the price, it will be added to the database and price history will be accumulated from then on.</p>
                     </div>
                     <GameSearch />
                 </div>
