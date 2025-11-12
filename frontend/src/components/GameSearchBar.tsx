@@ -41,7 +41,8 @@ export const GameSearch = () => {
             } finally {
                 setLoading(false);
             }
-        }, 300);
+        }, 300); // Debounce search to avoid excessive API calls
+
 
         return () => clearTimeout(timeoutId);
     }, [query]);

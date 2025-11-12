@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from backend.api.auth import verify_token, get_current_user, sync_user_profile, exchange_token_for_cookie, \
     get_current_user_flexible
 from backend.api.helper import get_game_data, search_games_fallback, get_popular_games_from_steam
+from backend.api.ai_service import get_ai_game_recommendation
 from backend.supabase_client import supabase
 from backend.supabase_services.game_services import get_game_by_id, add_game, update_game_price
 from backend.supabase_services.price_history_services import get_latest_price, insert_price_history, get_price_history
@@ -17,6 +18,7 @@ from backend.sync_prices import run_sync_prices
 from backend.sync_prices import start
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from typing import Optional
 import sentry_sdk
 import stripe
 
@@ -71,6 +73,9 @@ class DonationRequest(BaseModel):
 
 class TokenRequest(BaseModel):
     token: str
+
+class AIRecommendationRequest(BaseModel):
+    user_input: Optional[str] = None
 
 @app.get("/")
 def read_root():
@@ -403,5 +408,19 @@ async def get_popular_games(limit: int = 10):
     except Exception as e:
         logger.error(f"Error fetching popular games: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch popular games")
+
+@app.post("/ai-recommendations")
+async def ai_recommendations_endpoint(request: AIRecommendationRequest, user=Depends(get_current_user)):
+    try:
+        result = await get_ai_game_recommendation(
+            user_id=user["sub"],
+            user_input=request.user_input
+        )
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in AI recommendations endpoint: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate recommendations")
 start()
 
