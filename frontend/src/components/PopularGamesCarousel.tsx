@@ -60,7 +60,12 @@ export default function PopularGamesCarousel() {
 
     return (
         <div className="relative w-full max-w-5xl mx-auto py-12 px-4">
-
+            <h3 className="text-lg text-center text-red-600 dark:text-red-400">
+                Note: Prices on the front page may be wrong due to Steam maintenance, especially on Tuesdays.
+            </h3>
+            <h3 className="text-lg text-center mb-8 text-blue-600 dark:text-blue-400">
+                Prices when searching should have the correct price.
+            </h3>
             {/* Carousel Part */}
             <div className="relative h-[500px] overflow-hidden rounded-2xl shadow-2xl">
                 {games.map((game, index) => (
