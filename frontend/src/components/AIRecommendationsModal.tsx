@@ -14,6 +14,7 @@ interface AIResponse {
     recommendations: Recommendation[];
     based_on_tracked_games: boolean;
     tracked_games_count: number;
+    requests_remaining: number;
 }
 
 interface AIRecommendationsModalProps {
@@ -178,6 +179,12 @@ export default function AIRecommendationsModal({isOpen, onClose}: AIRecommendati
                                     {aiResponse.based_on_tracked_games
                                     ? `Based on your ${aiResponse.tracked_games_count} tracked games`
                                     : 'Based on your custom request'}
+                                </p>
+                            </div>
+
+                            <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-3">
+                                <p className="text-sm text-purple-900 dark:text-purple-300 text-center">
+                                    <strong>{aiResponse.requests_remaining}</strong> AI requests remaining today. Consider donating to improve rates in the future!
                                 </p>
                             </div>
 

@@ -4,6 +4,7 @@ import json
 from fastapi import HTTPException
 from backend.supabase_client import supabase
 import logging
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +12,19 @@ openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 async def get_ai_game_recommendation(user_id: str, user_input: str = None):
     try:
+        DAILY_LIMIT = 10
+
+        yesterday = (datetime.now() - timedelta(days=1)).isoformat()
+        recent_requests = supabase.table("ai_request_logs").select("id").eq("user_id", user_id).gte("created_at", yesterday).execute()
+
+        if len(recent_requests.data) >= DAILY_LIMIT:
+            raise HTTPException(
+                status_code=429,
+                detail=f"Daily limit reached. You can make {DAILY_LIMIT} AI requests per day. Try again tomorrow!"
+            )
+
+        supabase.table("ai_request_logs").insert({"user_id": user_id}).execute()
+
         tracked = supabase.table("user_games").select("*, games(name, app_id)").eq("user_id", user_id).execute()
 
         tracked_games = [game["games"]["name"] for game in tracked.data if game.get('games')]
@@ -91,7 +105,8 @@ async def get_ai_game_recommendation(user_id: str, user_input: str = None):
             "reasoning": recommendations.get("reasoning", ""),
             "recommendations": recommendations.get("recommendations", []),
             "based_on_tracked_games": not bool(user_input),
-            "tracked_games_count": len(tracked_games)
+            "tracked_games_count": len(tracked_games),
+            "requests_remaining": DAILY_LIMIT - len(recent_requests.data) - 1
         }
     except json.JSONDecodeError as e:
         logger.error(f"Failed to parse AI response: {e}")
