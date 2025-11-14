@@ -76,9 +76,44 @@ export default function AIRecommendationsModal({isOpen, onClose}: AIRecommendati
         }
     };
 
-    const searchGame = (gameName: string) => {
-        onClose();
-        navigate(`/search?q=${encodeURIComponent(gameName)}`)
+    const searchGame = async (gameName: string) => {
+        if (!token || !user) {
+            navigate("/login")
+            return;
+        }
+
+        try {
+            const searchResponse = await fetch(`${API_URL}/search_games?query=${encodeURIComponent(gameName)}&limit=1`);
+            const searchData = await searchResponse.json();
+
+            if (!searchData.results || searchData.results.length === 0){
+                toast.error(`Could not find ${gameName} on Steam`);
+                return;
+            }
+
+            const game = searchData.results[0];
+
+            const trackResponse = await fetch(`${API_URL}/track-price/${game.app_id}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (trackResponse.ok){
+                const result = await trackResponse.json();
+                toast.success(result.message || `${gameName} added to tracking!`);
+            } else {
+                const error = await trackResponse.json();
+                if (trackResponse.status === 400) {
+                    toast('You are already tracking this game!')
+                } else {
+                    toast.error(error.detail || 'Failed to track game');
+                }
+            }
+        } catch (error) {
+            toast.error(`Failed to track ${gameName}: ${error}`);
+        }
 
     };
 
@@ -205,7 +240,7 @@ export default function AIRecommendationsModal({isOpen, onClose}: AIRecommendati
                                                 <button
                                                     onClick={() => searchGame(rec.title)}
                                                     className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
-                                                    Search & Track
+                                                    Track Price
                                                 </button>
                                             </div>
                                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
