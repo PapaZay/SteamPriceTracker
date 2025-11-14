@@ -17,10 +17,10 @@ return (
                                 <h2 className="text-2xl font-bold text-white">AI-Powered Game Recommendations</h2>
                             </div>
                             <p className="text-white/90 text-center">
-                                Get Personalized Steam game suggestions powered by GPT-4.1-nano.
+                                Personalized Steam game suggestions powered by GPT-4.1-nano.
                             </p>
                             <p className="text-white/90 text-center">
-                                Use either your tracked games or a custom request. (Account required)
+                                Get Recommendations from a custom request or from your tracked games. (Account required)
                             </p>
                             <p className="text-white/90 text-center">
                                 Try it now!
