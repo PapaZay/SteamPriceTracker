@@ -55,9 +55,10 @@ async def get_ai_game_recommendation(user_id: str, user_input: str = None):
             prompt = f"""You are a Steam game recommendation expert.
 
   User is currently tracking these games: {', '.join(tracked_games)}
+  
+  IMPORTANT: Do NOT recommend any of the games listed above. They are already tracking these games.
 
-  First, analyze their gaming preferences based on the tracked games. Then recommend 5 NEW Steam games they would enjoy (don't recommend games they're already
-   tracking).
+  First, analyze their gaming preferences based on the tracked games. Then recommend 5 NEW Steam games they would enjoy that are NOT in their tracked list.
 
   Respond with ONLY valid JSON in this exact format:
   {{
@@ -98,6 +99,20 @@ async def get_ai_game_recommendation(user_id: str, user_input: str = None):
 
         recommendations = json.loads(content)
 
+        if not user_input and tracked_games:
+            tracked_games_lower = [game.lower() for game in tracked_games]
+
+            original_count = len(recommendations.get("recommendations", []))
+
+            filter_recs = [
+                rec for rec in recommendations.get("recommendations", [])
+                if rec.get("title", "").lower() not in tracked_games_lower
+            ]
+            recommendations["recommendations"] = filter_recs
+
+
+            if len(filter_recs) < original_count:
+                logger.warning(f"Filtered {original_count - len(filter_recs)} already tracked games from AI recommendations")
 
         logger.info(f"AI recommendations generated for {user_id} using gpt-4.1-nano")
 
