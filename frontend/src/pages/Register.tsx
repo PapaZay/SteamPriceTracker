@@ -58,6 +58,22 @@ export default function Register(){
         }
     }
 
+
+    {/*const handleAppleSignUp = async () => {
+        setLoading(true)
+        setError('')
+        const {error} = await supabase.auth.signInWithOAuth({
+            provider: 'apple',
+            options: {
+                redirectTo: `${window.location.origin}/`
+            }
+        })
+        if (error) {
+            setError(error.message)
+            setLoading(false)
+        }
+    } */}
+
     const handleGitHubSignUp = async () => {
         setLoading(true)
         setError('')
