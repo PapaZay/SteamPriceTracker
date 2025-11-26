@@ -198,7 +198,7 @@ export default function Alerts() {
                                 </div>
                                 <button
                                     onClick={() => deleteAlert(alert.id)}
-                                    className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                    className="text-red-500 bg-transparent hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                                     title="Delete Alert">
                                     <Trash2 className="h-4 w-4" />
                                 </button>
