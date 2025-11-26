@@ -176,7 +176,7 @@ export default function Alerts() {
                                                 <span> • Target: {alert.target_value}% off</span>
                                             )}
                                             {alert.alert_type === 'price_drop' && (
-                                                <span> • Target: ${alert.target_value.toFixed(2)} drop</span>
+                                                <span> • Alert on any price decrease</span>
                                             )}
                                         </div>
                                         <div className="flex items-center gap-4 text-sm">
