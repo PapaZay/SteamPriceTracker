@@ -7,7 +7,9 @@ import Snowfall from "react-snowfall";
 export default function Home(){
     return (
         <div className="min-h-screen flex flex-col overflow-x-hidden bg-gray-100 dark:bg-darkblue text-gray-900 dark:text-gray-100">
-            <Snowfall snowflakeCount={200} />
+            <div className="fixed inset-0 pointer-events-none z-50">
+                <Snowfall snowflakeCount={200} />
+            </div>
             <Navbar />
             <main className="p-8 text-center">
                 <AIRecommendationsButton />
