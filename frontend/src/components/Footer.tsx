@@ -15,7 +15,7 @@ const Footer = () => {
                     </a>
                 </div>
                 <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-                    © 2025 SteamPriceTracker. Built by Isaiah Flager-Hearan
+                    © 2026 SteamPriceTracker. Built by Isaiah Flager-Hearan
                 </div>
             </div>
 
