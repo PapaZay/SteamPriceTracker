@@ -217,8 +217,8 @@ export default function AIRecommendationsModal({isOpen, onClose}: AIRecommendati
                                 </p>
                             </div>
 
-                            <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-3">
-                                <p className="text-sm text-purple-900 dark:text-purple-300 text-center">
+                            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3">
+                                <p className="text-sm text-blue-900 dark:text-blue-300 text-center">
                                     <strong>{aiResponse.requests_remaining}</strong> AI requests remaining today. Consider donating to improve rates in the future!
                                 </p>
                             </div>
