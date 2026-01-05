@@ -122,7 +122,7 @@ export default function AIRecommendationsModal({isOpen, onClose}: AIRecommendati
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-lg">
+                <div className="sticky top-0 bg-blue-700 text-white p-6 rounded-t-lg">
                     <div className="flex justify-between items-center">
                         <div>
                             <h2 className="text-3xl font-bold flex items-center gap-2">
@@ -185,7 +185,7 @@ export default function AIRecommendationsModal({isOpen, onClose}: AIRecommendati
                     <button
                         onClick={getRecommendations}
                         disabled={loading}
-                        className="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                        className="w-full py-3 px-6 bg-blue-700 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                         >
                         {loading ? (
                             <span className="flex items-center justify-center gap-2">
