@@ -11,7 +11,7 @@ export default function Search(){
             <main className="p-8">
                 <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl font-extrabold mb-4">Search & Track Games</h1>
+                    <h1 className="text-3xl font-pixel tracking-wider leading-none antialiased mb-4">Look for Games Here</h1>
                     <button onClick={() => setShowAIModal(true)}
                             className="px-6 py-3 bg-blue-700 text-white font-semibold rounded-lg shadow-lg inline-flex items-center gap-2">
                         AI Recommendations <span className="px-2 py-1 text-xs text-blue-600 bg-blue-100 rounded">Beta</span>

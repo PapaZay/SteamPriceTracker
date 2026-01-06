@@ -13,10 +13,10 @@ export default function Home(){
             <Navbar />
             <main className="p-8 text-center">
                 <AIRecommendationsButton />
-                <h1 className="text-4xl font-extrabold mb-4">Welcome to SteamPriceTracker</h1>
-                <p className="text-lg mb-6">Track game prices from Steam and get notified about the best deals!</p>
+                <h1 className="text-xl font-pixel tracking-wider leading-none antialiased mb-4">Welcome to SteamPriceTracker</h1>
+                <p className="text-md mb-6 font-pixel tracking-wider leading-none antialiased">Track game prices from Steam and get notified about the best deals!</p>
                 <Link to="/search">
-            <button className="px-6 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition">
+            <button className="px-6 py-2 text-s font-pixel tracking-wider leading-tight antialiased rounded bg-blue-600 text-white hover:bg-blue-700 transition">
                 Start Tracking
             </button>
                 </Link>
