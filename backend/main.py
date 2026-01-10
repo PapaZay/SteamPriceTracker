@@ -1,4 +1,4 @@
-from fastapi import Response, FastAPI, HTTPException, Path, Depends, Header
+from fastapi import Response, FastAPI, HTTPException, Path, Depends, Header, Request
 from pydantic import BaseModel
 from backend.api.auth import verify_token, get_current_user, sync_user_profile, exchange_token_for_cookie, \
     get_current_user_flexible
@@ -11,6 +11,7 @@ from backend.supabase_services.user_games_services import track_game_for_user, u
 from backend.supabase_services.user_profiles_services import is_admin
 from backend.supabase_services.price_alert_services import create_price_alert, get_user_alerts, delete_alert
 from backend.models.game import Game
+from backend.api.turnstile_service import verify_turnstile
 import logging
 import os
 from datetime import datetime
@@ -51,6 +52,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+class TurnstileRequest(BaseModel):
+    token: str
 
 class PriceOverview(BaseModel):
     game: str
@@ -422,5 +425,14 @@ async def ai_recommendations_endpoint(request: AIRecommendationRequest, user=Dep
     except Exception as e:
         logger.error(f"Error in AI recommendations endpoint: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate recommendations")
+
+@app.post("/verify-turnstile")
+async def verify_turnstile_endpoint(request: TurnstileRequest, http_request: Request):
+    ip = http_request.client.host
+    is_valid = await verify_turnstile(request.token, ip)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail="Invalid Captcha")
+    return {"success": True}
+
 start()
 

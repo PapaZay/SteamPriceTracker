@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {supabase} from "../supabaseClient";
 import {Mail, Lock, Eye, EyeOff} from "lucide-react";
-
+import {Turnstile} from "@marsidev/react-turnstile";
 export default function Register(){
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -11,6 +11,7 @@ export default function Register(){
     const [loading, setLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    const [turnstileToken, setTurnstileToken] = useState('');
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -28,6 +29,25 @@ export default function Register(){
             setError('Password must be at least 6 characters long')
             setLoading(false)
             return
+        }
+
+        try {
+            const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL}/verify-turnstile`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: turnstileToken })
+            });
+            if (!verifyResponse.ok) {
+            setError('Captcha verification failed. Please try again.');
+            setLoading(false);
+            return;
+            }
+        } catch {
+            setError('Failed to verify captcha. Please try again.');
+            setLoading(false);
+            return;
         }
 
         const {error} = await supabase.auth.signUp({
@@ -228,10 +248,18 @@ export default function Register(){
                             </div>
                         </div>
                         
+                        <div className="flex justify-center">
+                            <Turnstile
+                                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                                onSuccess={(token) => setTurnstileToken(token)}
+                                options={{theme: "dark"}}
+                            />
+                        </div>
+                        
                         <button
                             type="submit"
                             className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={loading}
+                            disabled={loading || !turnstileToken}
                         >
                             {loading ? 'Creating account...' : 'Create account'}
                         </button>
