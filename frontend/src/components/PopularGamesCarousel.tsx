@@ -140,7 +140,7 @@ export default function PopularGamesCarousel() {
 
             <button
                 onClick={() => setCurrentIndex((prev) => (prev - 1 + games.length) % games.length)}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 backdrop-blur-sm text-white p-4 rounded-full transition-all shadow-lg"
+                className="absolute left-4 top-1/2 -translate-y-1/2 focus:outline-none focus:ring-0 bg-transparent border-none text-white p-4"
                 aria-label="Previous Game"
                 >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,7 +149,7 @@ export default function PopularGamesCarousel() {
             </button>
             <button
                 onClick={() => setCurrentIndex((prev) => (prev + 1) % games.length)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 backdrop-blur-sm text-white p-4 rounded-full transition-all shadow-lg"
+                className="absolute right-4 top-1/2 -translate-y-1/2 focus:outline-none focus:ring-0 bg-transparent border-none text-white p-4"
                 aria-label="Next game"
             >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
