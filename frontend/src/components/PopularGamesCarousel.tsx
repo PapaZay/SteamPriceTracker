@@ -79,23 +79,17 @@ export default function PopularGamesCarousel() {
                                 : 'translate-x-full opacity-0 scale-95'
                         }`}
                     >
-                        <div className="relative h-full w-full bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-2xl overflow-hidden">
-                            <div
-                                className="absolute inset-0 bg-cover bg-center opacity-20 blur-md scale-110"
-                                style={{
-                                    backgroundImage: `url(${game.header_image})`
-                                }}
-                            />
-                            <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 text-white">
+                            <div className="relative h-full w-full rounded-2xl overflow-hidden">
                                     <img
                                         src={game.header_image}
                                         alt={game.name}
-                                        className="w-full max-w-xl rounded-lg shadow-2xl mb-6 border-4 border-white/10"
+                                        className="w-full h-full object-cover"
                                         />
+                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
                                     <h3 className="text-3xl font-bold mb-3 text-center drop-shadow-2xl">
                                         {game.name}
                                     </h3>
-                                    <div className="flex items-center gap-4 mb-3">
+                                    <div className="flex justify-center items-center gap-4 mb-3">
                                         {game.is_free ? (
                                             <span className="text-2xl font-bold text-green-400">
                                                 Free to Play
@@ -118,14 +112,14 @@ export default function PopularGamesCarousel() {
                                             </span>
                                         )}
                                     </div>
-                                    <div className="bg-blue-600/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
-                                        <span className="text-lg font-semibold">
+                                    <div className="flex justify-center">
+                                        <span className="bg-blue-600/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg text-lg font-semibold">
                                             Top Seller
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                            </div>
                 ))}
             </div>
             <div className="flex justify-center gap-3 mt-8">

@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import os
 from fastapi import HTTPException, Path, Depends, Header
 import httpx
-from fastapi import HTTPException
 from datetime import datetime
 import asyncio
 from backend.supabase_services.game_services import search_games_in_db
@@ -141,6 +140,27 @@ async def get_popular_games_from_steam(limit: int = 10):
                   # Stop once we have enough games
                 if len(games) >= limit:
                     break
+                
+            async def fetch_accurate_price(game):
+                try:
+                    url = f"https://store.steampowered.com/api/appdetails?appids={game['app_id']}&cc=us&l=en"
+                    resp = await client.get(url)
+                    if resp.status_code == 200:
+                        app_data = resp.json().get(str(game['app_id']), {})
+                        if app_data.get('success'):
+                            price_overview = app_data['data'].get('price_overview')
+                            if price_overview:
+                                game['current_price'] = price_overview['final'] / 100
+                                game['original_price'] = price_overview['initial'] / 100
+                                game['discount_percent'] = price_overview.get('discount_percent', 0)
+                            elif app_data['data'].get('is_free'):
+                                game['current_price'] = 0
+                                game['original_price'] = 0
+                                game['is_free'] = True
+                except Exception as e:
+                    print(f"Failed to fetch price for {game['name']}: {e}")
+            await asyncio.gather(*[fetch_accurate_price(g) for g in games])
+                
             print(f"DEBUG: Returning {len(games)} games")
             return games
 
