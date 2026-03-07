@@ -1,7 +1,8 @@
 import {useState} from "react";
 import {supabase} from "../supabaseClient";
-import {Mail, Lock, Eye, EyeOff} from "lucide-react";
+import {Mail, Lock} from "lucide-react";
 import {Turnstile} from "@marsidev/react-turnstile";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 export default function Login(){
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -126,7 +127,7 @@ export default function Login(){
                     
                     <form onSubmit={handleLogin} className="space-y-4">
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-1">
                                 Email address
                             </label>
                             <div className="relative">
@@ -144,7 +145,7 @@ export default function Login(){
                         </div>
                         
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-400 mb-1">
                                 Password
                             </label>
                             <div className="relative">
@@ -161,9 +162,9 @@ export default function Login(){
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-3 h-5 w-5 text-gray-400 hover:text-gray-600"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent p-2 focus:outline-none text-gray-400 hover:text-gray-600"
                                 >
-                                    {showPassword ? <EyeOff /> : <Eye />}
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </button>
                             </div>
                         </div>
