@@ -1,6 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-  interface PriceData {
+  export interface PriceData {
     timestamp: string;
     final_price: number;
     initial_price: number;

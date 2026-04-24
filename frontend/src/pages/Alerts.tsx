@@ -97,8 +97,7 @@ export default function Alerts() {
             } else {
                 toast.error('Failed to delete alert');
             }
-        } catch (error) {
-            console.error(`Error deleting alert: ${error}`);
+        } catch {
             toast.error('Error deleting alert');
         }
     };
@@ -352,17 +351,18 @@ function CreateAlertModal({onClose, onSuccess}: CreateAlertModalProps): React.Re
                                     <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 rounded shadow-lg max-h-48 border border-gray-300 dark:border-gray-600 overflow-y-auto">
                                         {filteredGames.length > 0 ? (
                                             filteredGames.map((game) => (
-                                                <div
+                                                <button
+                                                type="button"
                                                 key={game.app_id}
                                                 onClick={() => {
                                                     setSelectedGame(game.app_id.toString())
                                                     setGameSearch(game.games.name);
                                                     setShowGameDropdown(false);
                                                 }}
-                                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer text-gray-800 dark:text-white"
+                                                className="w-full text-left p-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer text-gray-800 dark:text-white"
                                                 >
                                                     {game.games.name}
-                                                </div>
+                                                </button>
                                             ))
                                         ) : (
                                             <div className="p-2 text-gray-500 dark:text-gray-400">

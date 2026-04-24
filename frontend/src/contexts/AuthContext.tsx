@@ -32,9 +32,8 @@ const exchangeTokenForCookie = async (token: string) => {
             credentials: 'include',
             body: JSON.stringify({token})
             });
-            console.log('Token exchanged for HttpOnly cookie')
-        } catch (error) {
-            console.error('Error exchanging token for cookie:', error);
+        } catch {
+            // silent — cookie exchange is best-effort
     }
 };
 
@@ -81,9 +80,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
                     credentials: 'include'
                 });
 
-                console.log('Logged out successfully.');
-            } catch (error) {
-                console.log('Error logging out:', error);
+            } catch {
             }
 
         };

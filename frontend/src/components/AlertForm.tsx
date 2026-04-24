@@ -1,12 +1,18 @@
 import { useState } from "react";
 import {ChevronDownIcon, ChevronUpIcon} from "lucide-react";
 
+export interface AlertData {
+    app_id: number;
+    alert_type: string;
+    target_value: number;
+}
+
 interface AlertFormProps {
     game: {
         app_id: number;
         name: string;
     };
-    onCreateAlert: (alertData: any) => void;
+    onCreateAlert: (alertData: AlertData) => void;
 }
 const AlertForm = ({game, onCreateAlert}: AlertFormProps) => {
     const [isOpen, setIsOpen] = useState(false);

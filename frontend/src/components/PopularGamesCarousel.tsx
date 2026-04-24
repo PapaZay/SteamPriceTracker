@@ -23,11 +23,9 @@ export default function PopularGamesCarousel() {
             try {
                 const response = await fetch(`${API_URL}/popular-games?limit=10`);
                 const data = await response.json();
-                console.log("API Response:", data);  // DEBUG
-                console.log("First game price:", data.games[0]?.current_price);
                 setGames(data.games);
-            } catch (error) {
-                console.error("Failed to fetch popular games:", error);
+            } catch {
+                // carousel silently hides on fetch failure
             } finally {
                 setLoading(false);
             }

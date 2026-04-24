@@ -4,8 +4,10 @@ import {useAuth} from "../contexts/AuthContext.tsx";
 import Navbar from "../components/Navbar.tsx";
 import toast from 'react-hot-toast'
 import {PriceChart} from "../components/PriceChart.tsx";
+import type {PriceData} from "../components/PriceChart.tsx";
 import Footer from "../components/Footer.tsx";
 import AlertForm from "../components/AlertForm.tsx";
+import type {AlertData} from "../components/AlertForm.tsx";
 interface TrackedGamesProps {
     app_id: number;
     games: {
@@ -18,7 +20,7 @@ interface TrackedGamesProps {
 }
 
 export default function Dashboard() {
-    const [priceHistory, setPriceHistory] = useState<{[key: number]: any[]}>({});
+    const [priceHistory, setPriceHistory] = useState<Record<number, PriceData[]>>({});
     const [trackedGames, setTrackedGames] = useState<TrackedGamesProps[]>([]);
     const {token, user} = useAuth();
     const [loading, setLoading] = useState(true);
@@ -132,7 +134,7 @@ export default function Dashboard() {
       }
   };
 
-    const handleCreateAlert = async (alertData: any) => {
+    const handleCreateAlert = async (alertData: AlertData) => {
         try {
             const response = await fetch(`${API_URL}/alerts`, {
                 method: 'POST',

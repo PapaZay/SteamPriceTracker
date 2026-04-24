@@ -35,8 +35,7 @@ export const GameSearch = () => {
                 const response = await fetch(`${API_URL}/search_games?query=${encodeURIComponent(query)}&limit=8`);
                 const data = await response.json();
                 setResults(data.results || []);
-            } catch (error) {
-                console.error(`Search failed:`, error);
+            } catch {
                 setResults([]);
             } finally {
                 setLoading(false);
